@@ -10,63 +10,63 @@ public class PerfilPessoal : BaseEntity
     /// <summary>
     /// Cor/Raça (FK → Dominios)
     /// </summary>
-    public int? CorRaca { get; private set; }
+    public int? CorRaca { get; set; }
 
     /// <summary>
     /// Pronome de tratamento (FK → Dominios)
     /// </summary>
-    public int? Pronome { get; private set; }
+    public int? Pronome { get; set; }
 
     /// <summary>
     /// Identidade de gênero (FK → Dominios)
     /// </summary>
-    public int? IdentidadeGenero { get; private set; }
+    public int? IdentidadeGenero { get; set; }
 
     /// <summary>
     /// Orientação sexual (FK → Dominios)
     /// </summary>
-    public int? OrientacaoSexual { get; private set; }
+    public int? OrientacaoSexual { get; set; }
 
     /// <summary>
     /// CPF do candidato
     /// </summary>
-    public string? Cpf { get; private set; }
+    public string? Cpf { get; set; }
 
     /// <summary>
     /// RG do candidato
     /// </summary>
-    public string? Rg { get; private set; }
+    public string? Rg { get; set; }
 
     /// <summary>
     /// Texto "Sobre mim" do candidato
     /// </summary>
-    public string? SobreMim { get; private set; }
+    public string? SobreMim { get; set; }
 
     /// <summary>
     /// Local de residência
     /// </summary>
-    public string? LocalResidencia { get; private set; }
+    public string? LocalResidencia { get; set; }
 
     /// <summary>
     /// Códigos de ações afirmativas separados por ;
     /// </summary>
-    public string? AcoesAfirmativas { get; private set; }
+    public string? AcoesAfirmativas { get; set; }
 
     /// <summary>
     /// Descrição de PCD (Pessoa com Deficiência)
     /// </summary>
-    public string? DescricaoPcd { get; private set; }
+    public string? DescricaoPcd { get; set; }
 
     // Redes sociais
-    public string? Instagram { get; private set; }
-    public string? Facebook { get; private set; }
-    public string? Linkedin { get; private set; }
+    public string? Instagram { get; set; }
+    public string? Facebook { get; set; }
+    public string? Linkedin { get; set; }
 
     // Endereço (Value Object)
-    public Endereco? Endereco { get; private set; }
+    public Endereco? Endereco { get; set; }
 
     // Relacionamento 1:1
-    public Candidato? Candidato { get; private set; }
+    public Candidato? Candidato { get; set; }
 
     protected PerfilPessoal() { }
 

@@ -111,4 +111,94 @@ public class CandidatoController : ControllerBase
 
         return Ok(new { mensagem = "Se o email existir, um novo link de confirmação será enviado." });
     }
+
+    /// <summary>
+    /// Cria ou atualiza o perfil pessoal do candidato
+    /// </summary>
+    [HttpPost("perfil-pessoal/upsert")]
+    [Authorize]
+    public async Task<IActionResult> UpsertPerfilPessoal([FromBody] PerfilPessoalUpsertRequestDto request)
+    {
+        var usuarioIdClaim = User.FindFirst("id")?.Value;
+        if (string.IsNullOrWhiteSpace(usuarioIdClaim))
+            return Unauthorized();
+
+        var resultado = await _candidatoService.UpsertPerfilPessoalAsync(Guid.Parse(usuarioIdClaim), request);
+
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<PerfilPessoalResponseDto>.Ok(resultado.Value))
+            : BadRequest(ResultadoDto<object>.Falha("ERRO_PERFIL", "Erro ao salvar perfil pessoal."));
+    }
+
+    /// <summary>
+    /// Cria ou atualiza o perfil profissional do candidato
+    /// </summary>
+    [HttpPost("perfil-profissional/upsert")]
+    [Authorize]
+    public async Task<IActionResult> UpsertPerfilProfissional([FromBody] PerfilProfissionalUpsertRequestDto request)
+    {
+        var usuarioIdClaim = User.FindFirst("id")?.Value;
+        if (string.IsNullOrWhiteSpace(usuarioIdClaim))
+            return Unauthorized();
+
+        var resultado = await _candidatoService.UpsertPerfilProfissionalAsync(Guid.Parse(usuarioIdClaim), request);
+
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<PerfilProfissionalResponseDto>.Ok(resultado.Value))
+            : BadRequest(ResultadoDto<object>.Falha("ERRO_PERFIL", "Erro ao salvar perfil profissional."));
+    }
+
+    /// <summary>
+    /// Salva o resultado do teste Big Five
+    /// </summary>
+    [HttpPost("bigfive")]
+    [Authorize]
+    public async Task<IActionResult> SalvarBigFive([FromBody] BigFiveRequestDto request)
+    {
+        var usuarioIdClaim = User.FindFirst("id")?.Value;
+        if (string.IsNullOrWhiteSpace(usuarioIdClaim))
+            return Unauthorized();
+
+        var resultado = await _candidatoService.SalvarBigFiveAsync(Guid.Parse(usuarioIdClaim), request);
+
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<BigFiveResponseDto>.Ok(resultado.Value))
+            : BadRequest(ResultadoDto<object>.Falha("ERRO_BIGFIVE", "Erro ao salvar teste Big Five."));
+    }
+
+    /// <summary>
+    /// Obtém o perfil pessoal do candidato
+    /// </summary>
+    [HttpGet("perfil-pessoal")]
+    [Authorize]
+    public async Task<IActionResult> GetPerfilPessoal()
+    {
+        var usuarioIdClaim = User.FindFirst("id")?.Value;
+        if (string.IsNullOrWhiteSpace(usuarioIdClaim))
+            return Unauthorized();
+
+        var resultado = await _candidatoService.GetPerfilPessoalAsync(Guid.Parse(usuarioIdClaim));
+
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<PerfilPessoalResponseDto>.Ok(resultado.Value))
+            : NotFound(ResultadoDto<object>.Falha("PERFIL_NAO_ENCONTRADO", "Perfil pessoal não encontrado."));
+    }
+
+    /// <summary>
+    /// Obtém o perfil profissional do candidato
+    /// </summary>
+    [HttpGet("perfil-profissional")]
+    [Authorize]
+    public async Task<IActionResult> GetPerfilProfissional()
+    {
+        var usuarioIdClaim = User.FindFirst("id")?.Value;
+        if (string.IsNullOrWhiteSpace(usuarioIdClaim))
+            return Unauthorized();
+
+        var resultado = await _candidatoService.GetPerfilProfissionalAsync(Guid.Parse(usuarioIdClaim));
+
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<PerfilProfissionalResponseDto>.Ok(resultado.Value))
+            : NotFound(ResultadoDto<object>.Falha("PERFIL_NAO_ENCONTRADO", "Perfil profissional não encontrado."));
+    }
 }

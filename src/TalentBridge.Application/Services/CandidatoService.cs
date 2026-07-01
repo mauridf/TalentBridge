@@ -217,4 +217,329 @@ public class CandidatoService : ICandidatoService
 
         return Result.Ok(dto);
     }
+
+    /// <summary>
+    /// Cria ou atualiza o perfil pessoal
+    /// </summary>
+    public async Task<Result<PerfilPessoalResponseDto>> UpsertPerfilPessoalAsync(
+        Guid candidatoId,
+        PerfilPessoalUpsertRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var candidato = await _unitOfWork.Candidatos.GetByIdAsync(candidatoId, cancellationToken);
+        if (candidato == null)
+            return Result.Fail<PerfilPessoalResponseDto>("CANDIDATO_NAO_ENCONTRADO");
+
+        PerfilPessoal perfil;
+
+        if (candidato.PerfilPessoalId.HasValue)
+        {
+            // Atualizar existente
+            perfil = await _unitOfWork.PerfisPessoais.GetByIdAsync(candidato.PerfilPessoalId.Value, cancellationToken);
+            if (perfil == null)
+                return Result.Fail<PerfilPessoalResponseDto>("PERFIL_NAO_ENCONTRADO");
+
+            // Atualizar propriedades
+            AtualizarPerfilPessoal(perfil, request);
+            _unitOfWork.PerfisPessoais.Update(perfil);
+        }
+        else
+        {
+            // Criar novo
+            perfil = new PerfilPessoal(request.SobreMim);
+            AtualizarPerfilPessoal(perfil, request);
+            await _unitOfWork.PerfisPessoais.AddAsync(perfil, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            candidato.PerfilPessoalId = perfil.Id;
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Perfil pessoal atualizado para candidato: {CandidatoId}", candidatoId);
+
+        return Result.Ok(MapearPerfilPessoalResponse(perfil));
+    }
+
+    /// <summary>
+    /// Cria ou atualiza o perfil profissional
+    /// </summary>
+    public async Task<Result<PerfilProfissionalResponseDto>> UpsertPerfilProfissionalAsync(
+        Guid candidatoId,
+        PerfilProfissionalUpsertRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var candidato = await _unitOfWork.Candidatos.GetByIdAsync(candidatoId, cancellationToken);
+        if (candidato == null)
+            return Result.Fail<PerfilProfissionalResponseDto>("CANDIDATO_NAO_ENCONTRADO");
+
+        PerfilProfissional perfil;
+
+        if (candidato.PerfilProfissionalId.HasValue)
+        {
+            perfil = await _unitOfWork.PerfisProfissionais.GetByIdAsync(candidato.PerfilProfissionalId.Value, cancellationToken);
+            if (perfil == null)
+                return Result.Fail<PerfilProfissionalResponseDto>("PERFIL_NAO_ENCONTRADO");
+        }
+        else
+        {
+            perfil = new PerfilProfissional(request.DispensaExperienciaProfissional);
+            await _unitOfWork.PerfisProfissionais.AddAsync(perfil, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            candidato.PerfilProfissionalId = perfil.Id;
+        }
+
+        // Atualizar formações
+        if (request.FormacoesAcademicas?.Any() == true)
+        {
+            // TODO: Remover formações existentes e adicionar novas
+            foreach (var formacaoReq in request.FormacoesAcademicas)
+            {
+                var formacao = new FormacaoAcademica(
+                    perfilProfissionalId: perfil.Id,
+                    grau: formacaoReq.Grau,
+                    areaAtuacao: formacaoReq.AreaAtuacao,
+                    dataConclusao: formacaoReq.DataConclusao,
+                    concluido: formacaoReq.Concluido);
+                perfil.AdicionarFormacaoAcademica(formacao);
+            }
+        }
+
+        // Atualizar experiências
+        if (request.ExperienciasProfissionais?.Any() == true)
+        {
+            foreach (var expReq in request.ExperienciasProfissionais)
+            {
+                var experiencia = new ExperienciaProfissional(
+                    perfilProfissionalId: perfil.Id,
+                    empresa: expReq.Empresa,
+                    posicao: expReq.Posicao,
+                    dataInicio: expReq.DataInicio,
+                    dataFim: expReq.DataFim,
+                    empregoAtual: expReq.EmpregoAtual);
+                perfil.AdicionarExperienciaProfissional(experiencia);
+            }
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Perfil profissional atualizado para candidato: {CandidatoId}", candidatoId);
+
+        return Result.Ok(MapearPerfilProfissionalResponse(perfil));
+    }
+
+    /// <summary>
+    /// Salva o resultado do teste Big Five
+    /// </summary>
+    public async Task<Result<BigFiveResponseDto>> SalvarBigFiveAsync(
+        Guid candidatoId,
+        BigFiveRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var candidato = await _unitOfWork.Candidatos.GetByIdAsync(candidatoId, cancellationToken);
+        if (candidato == null)
+            return Result.Fail<BigFiveResponseDto>("CANDIDATO_NAO_ENCONTRADO");
+
+        // Validar pontuações (0-100)
+        if (!ValidarPontuacaoBigFive(request))
+            return Result.Fail<BigFiveResponseDto>("PONTUACAO_INVALIDA");
+
+        candidato.SalvarTesteBigFive(
+            extroversao: request.Extroversao,
+            amabilidade: request.Amabilidade,
+            consciencia: request.Consciencia,
+            estabilidadeEmocional: request.EstabilidadeEmocional,
+            aberturaExperiencia: request.AberturaExperiencia);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Teste Big Five salvo para candidato: {CandidatoId}", candidatoId);
+
+        return Result.Ok(MapearBigFiveResponse(candidato));
+    }
+
+    /// <summary>
+    /// Obtém o resultado do teste Big Five
+    /// </summary>
+    public async Task<Result<BigFiveResponseDto>> GetBigFiveAsync(
+        Guid candidatoId,
+        CancellationToken cancellationToken = default)
+    {
+        var candidato = await _unitOfWork.Candidatos.GetByIdAsync(candidatoId, cancellationToken);
+        if (candidato == null)
+            return Result.Fail<BigFiveResponseDto>("CANDIDATO_NAO_ENCONTRADO");
+
+        return Result.Ok(MapearBigFiveResponse(candidato));
+    }
+
+    /// <summary>
+    /// Obtém o perfil pessoal
+    /// </summary>
+    public async Task<Result<PerfilPessoalResponseDto>> GetPerfilPessoalAsync(
+        Guid candidatoId,
+        CancellationToken cancellationToken = default)
+    {
+        var candidato = await _unitOfWork.Candidatos.GetByIdAsync(candidatoId, cancellationToken);
+        if (candidato == null || !candidato.PerfilPessoalId.HasValue)
+            return Result.Fail<PerfilPessoalResponseDto>("PERFIL_NAO_ENCONTRADO");
+
+        var perfil = await _unitOfWork.PerfisPessoais.GetByIdAsync(candidato.PerfilPessoalId.Value, cancellationToken);
+        if (perfil == null)
+            return Result.Fail<PerfilPessoalResponseDto>("PERFIL_NAO_ENCONTRADO");
+
+        return Result.Ok(MapearPerfilPessoalResponse(perfil));
+    }
+
+    /// <summary>
+    /// Obtém o perfil profissional
+    /// </summary>
+    public async Task<Result<PerfilProfissionalResponseDto>> GetPerfilProfissionalAsync(
+        Guid candidatoId,
+        CancellationToken cancellationToken = default)
+    {
+        var candidato = await _unitOfWork.Candidatos.GetByIdCompletoAsync(candidatoId, cancellationToken);
+        if (candidato == null || candidato.PerfilProfissional == null)
+            return Result.Fail<PerfilProfissionalResponseDto>("PERFIL_NAO_ENCONTRADO");
+
+        return Result.Ok(MapearPerfilProfissionalResponse(candidato.PerfilProfissional));
+    }
+
+    // ==========================================
+    // Métodos privados de mapeamento
+    // ==========================================
+
+    private static PerfilPessoalResponseDto MapearPerfilPessoalResponse(PerfilPessoal perfil)
+    {
+        var dto = new PerfilPessoalResponseDto
+        {
+            Id = perfil.Id,
+            CorRaca = perfil.CorRaca,
+            Pronome = perfil.Pronome,
+            IdentidadeGenero = perfil.IdentidadeGenero,
+            OrientacaoSexual = perfil.OrientacaoSexual,
+            Cpf = perfil.Cpf,
+            Rg = perfil.Rg,
+            SobreMim = perfil.SobreMim,
+            LocalResidencia = perfil.LocalResidencia,
+            AcoesAfirmativas = perfil.AcoesAfirmativas,
+            DescricaoPcd = perfil.DescricaoPcd,
+            Instagram = perfil.Instagram,
+            Facebook = perfil.Facebook,
+            Linkedin = perfil.Linkedin
+        };
+
+        if (perfil.Endereco != null)
+        {
+            dto.Endereco = new EnderecoResponseDto
+            {
+                CEP = perfil.Endereco.CEP,
+                Rua = perfil.Endereco.Rua,
+                Numero = perfil.Endereco.Numero,
+                Bairro = perfil.Endereco.Bairro,
+                Cidade = perfil.Endereco.Cidade,
+                Estado = perfil.Endereco.Estado,
+                Complemento = perfil.Endereco.Complemento,
+                Latitude = perfil.Endereco.Latitude,
+                Longitude = perfil.Endereco.Longitude
+            };
+        }
+
+        return dto;
+    }
+
+    private static PerfilProfissionalResponseDto MapearPerfilProfissionalResponse(PerfilProfissional perfil)
+    {
+        return new PerfilProfissionalResponseDto
+        {
+            Id = perfil.Id,
+            DispensaExperienciaProfissional = perfil.DispensaExperienciaProfissional,
+            FormacoesAcademicas = perfil.FormacoesAcademicas?
+                .Select(f => new FormacaoAcademicaResponseDto
+                {
+                    Id = f.Id,
+                    Grau = f.Grau,
+                    AreaAtuacao = f.AreaAtuacao,
+                    DataConclusao = f.DataConclusao,
+                    Concluido = f.Concluido
+                }).ToList(),
+            ExperienciasProfissionais = perfil.ExperienciasProfissionais?
+                .Select(e => new ExperienciaProfissionalResponseDto
+                {
+                    Id = e.Id,
+                    Empresa = e.Empresa,
+                    Posicao = e.Posicao,
+                    DataInicio = e.DataInicio,
+                    DataFim = e.DataFim,
+                    EmpregoAtual = e.EmpregoAtual
+                }).ToList(),
+            Competencias = perfil.CompetenciasCandidatos?
+                .Select(c => new CompetenciaCandidatoResponseDto
+                {
+                    CompetenciaId = c.CompetenciaId,
+                    Nome = c.Competencia?.Nome ?? "",
+                    Nivel = c.Nivel.ToString()
+                }).ToList()
+        };
+    }
+
+    private static BigFiveResponseDto MapearBigFiveResponse(Candidato candidato)
+    {
+        return new BigFiveResponseDto
+        {
+            Extroversao = candidato.Extroversao ?? 0,
+            Amabilidade = candidato.Amabilidade ?? 0,
+            Consciencia = candidato.Consciencia ?? 0,
+            EstabilidadeEmocional = candidato.EstabilidadeEmocional ?? 0,
+            AberturaExperiencia = candidato.AberturaExperiencia ?? 0,
+            DataUltimoTeste = candidato.DataUltimoTesteBigFive,
+            RealizouTeste = candidato.RealizouTesteBigFive()
+        };
+    }
+
+    private static void AtualizarPerfilPessoal(PerfilPessoal perfil, PerfilPessoalUpsertRequestDto request)
+    {
+        // Usar reflection para settar propriedades com private set
+        var tipo = typeof(PerfilPessoal);
+
+        tipo.GetProperty("CorRaca")?.SetValue(perfil, request.CorRaca);
+        tipo.GetProperty("Pronome")?.SetValue(perfil, request.Pronome);
+        tipo.GetProperty("IdentidadeGenero")?.SetValue(perfil, request.IdentidadeGenero);
+        tipo.GetProperty("OrientacaoSexual")?.SetValue(perfil, request.OrientacaoSexual);
+        tipo.GetProperty("Cpf")?.SetValue(perfil, request.Cpf?.Replace(".", "").Replace("-", ""));
+        tipo.GetProperty("Rg")?.SetValue(perfil, request.Rg);
+        tipo.GetProperty("SobreMim")?.SetValue(perfil, request.SobreMim);
+        tipo.GetProperty("LocalResidencia")?.SetValue(perfil, request.LocalResidencia);
+        tipo.GetProperty("AcoesAfirmativas")?.SetValue(perfil, request.AcoesAfirmativas);
+        tipo.GetProperty("DescricaoPcd")?.SetValue(perfil, request.DescricaoPcd);
+        tipo.GetProperty("Instagram")?.SetValue(perfil, request.Instagram);
+        tipo.GetProperty("Facebook")?.SetValue(perfil, request.Facebook);
+        tipo.GetProperty("Linkedin")?.SetValue(perfil, request.Linkedin);
+
+        // Atualizar endereço se tiver dados
+        if (!string.IsNullOrWhiteSpace(request.CEP) || !string.IsNullOrWhiteSpace(request.Cidade))
+        {
+            var endereco = Domain.ValueObjects.Endereco.Criar(
+                cep: request.CEP,
+                rua: request.Rua,
+                numero: request.Numero,
+                bairro: request.Bairro,
+                cidade: request.Cidade,
+                estado: request.Estado,
+                complemento: request.Complemento,
+                latitude: request.Latitude,
+                longitude: request.Longitude);
+
+            perfil.AtualizarEndereco(endereco);
+        }
+    }
+
+    private static bool ValidarPontuacaoBigFive(BigFiveRequestDto request)
+    {
+        return request.Extroversao >= 0 && request.Extroversao <= 100 &&
+               request.Amabilidade >= 0 && request.Amabilidade <= 100 &&
+               request.Consciencia >= 0 && request.Consciencia <= 100 &&
+               request.EstabilidadeEmocional >= 0 && request.EstabilidadeEmocional <= 100 &&
+               request.AberturaExperiencia >= 0 && request.AberturaExperiencia <= 100;
+    }
 }

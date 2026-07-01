@@ -37,4 +37,34 @@ public interface ICandidatoService
     /// Edita dados do candidato
     /// </summary>
     Task<Result<CandidatoResponseDto>> EditarAsync(Guid id, EditarCandidatoRequestDto request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Cria ou atualiza o perfil pessoal do candidato
+    /// </summary>
+    Task<Result<PerfilPessoalResponseDto>> UpsertPerfilPessoalAsync(Guid candidatoId, PerfilPessoalUpsertRequestDto request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Cria ou atualiza o perfil profissional do candidato
+    /// </summary>
+    Task<Result<PerfilProfissionalResponseDto>> UpsertPerfilProfissionalAsync(Guid candidatoId, PerfilProfissionalUpsertRequestDto request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Salva o resultado do teste Big Five
+    /// </summary>
+    Task<Result<BigFiveResponseDto>> SalvarBigFiveAsync(Guid candidatoId, BigFiveRequestDto request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém o resultado do teste Big Five
+    /// </summary>
+    Task<Result<BigFiveResponseDto>> GetBigFiveAsync(Guid candidatoId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém o perfil pessoal do candidato
+    /// </summary>
+    Task<Result<PerfilPessoalResponseDto>> GetPerfilPessoalAsync(Guid candidatoId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém o perfil profissional do candidato
+    /// </summary>
+    Task<Result<PerfilProfissionalResponseDto>> GetPerfilProfissionalAsync(Guid candidatoId, CancellationToken cancellationToken = default);
 }
