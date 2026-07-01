@@ -1,5 +1,7 @@
 using Serilog;
 using TalentBridge.Api.Configurations;
+using TalentBridge.Infrastructure.Data;
+using TalentBridge.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,10 +42,21 @@ try
     // Health Checks
     builder.Services.AddHealthChecksConfiguration(builder.Configuration);
 
+    // Registrar DbUpInitializer
+    builder.Services.AddSingleton<DbUpInitializer>();
+
+    // Registrar HttpClient para serviços externos
+    builder.Services.AddHttpClient();
+
     var app = builder.Build();
 
     // ==========================================
-    // 3. Pipeline de Middlewares
+    // 3. Executar Migrations (antes dos middlewares)
+    // ==========================================
+    app.UseDbUpMigrations();
+
+    // ==========================================
+    // 4. Pipeline de Middlewares
     // ==========================================
 
     app.UseSerilogRequestLogging(options =>
