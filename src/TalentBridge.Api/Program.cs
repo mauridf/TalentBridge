@@ -52,11 +52,10 @@ try
     builder.Services.AddScoped<ICandidatoService, CandidatoService>();
     builder.Services.AddScoped<IEmpresaService, EmpresaService>();
     builder.Services.AddScoped<IVagaService, VagaService>();
+    builder.Services.AddScoped<ICandidaturaService, CandidaturaService>();
 
     // Validators
     builder.Services.AddValidatorsFromAssembly(typeof(CandidatoService).Assembly);
-    builder.Services.AddValidatorsFromAssembly(typeof(EmpresaService).Assembly);
-    builder.Services.AddValidatorsFromAssembly(typeof(VagaService).Assembly);
 
     // CORS
     builder.Services.AddCorsConfiguration(builder.Configuration);
