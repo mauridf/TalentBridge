@@ -1,7 +1,6 @@
 using DbUp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 
 namespace TalentBridge.Infrastructure.Data;
 
@@ -17,7 +16,7 @@ public class DbUpInitializer
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' não encontrada.");
         _logger = logger;
 
-        // Caminho relativo à raiz do projeto
+        // Caminho relativo à raiz do projeto (executando da pasta Api)
         _scriptsPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
             "..", "..", "..", "..", "..", "db", "migrations");
@@ -28,6 +27,9 @@ public class DbUpInitializer
             _scriptsPath = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory, "db", "migrations");
         }
+
+        // Normalizar caminho
+        _scriptsPath = Path.GetFullPath(_scriptsPath);
     }
 
     public bool ExecuteMigrations()
@@ -38,6 +40,7 @@ public class DbUpInitializer
         if (!Directory.Exists(_scriptsPath))
         {
             _logger.LogError("❌ Diretório de migrations não encontrado: {ScriptsPath}", _scriptsPath);
+            _logger.LogInformation("🔍 BaseDirectory: {BaseDir}", AppDomain.CurrentDomain.BaseDirectory);
             return false;
         }
 
@@ -45,19 +48,25 @@ public class DbUpInitializer
             .OrderBy(f => f)
             .ToList();
 
+        if (scripts.Count == 0)
+        {
+            _logger.LogWarning("⚠️ Nenhum arquivo .sql encontrado em: {ScriptsPath}", _scriptsPath);
+            return true;
+        }
+
         _logger.LogInformation("📝 {Count} scripts encontrados", scripts.Count);
+        foreach (var script in scripts)
+        {
+            _logger.LogInformation("  → {ScriptName}", Path.GetFileName(script));
+        }
 
         // Garantir que o banco de dados existe
         EnsureDatabase.For.PostgresqlDatabase(_connectionString);
 
-        // Configurar o DbUp
+        // Configurar o DbUp com scripts do sistema de arquivos
         var upgrader = DeployChanges.To
             .PostgresqlDatabase(_connectionString)
-            .WithScriptsFromFileSystem(_scriptsPath, new DbUp.Engine.SqlScriptOptions
-            {
-                ScriptType = DbUp.Engine.ScriptType.RunOnce,
-                RunGroupOrder = DbUp.Engine.RunGroupOrder.ByFilename
-            })
+            .WithScriptsFromFileSystem(_scriptsPath)
             .WithTransactionPerScript()
             .LogToConsole()
             .Build();

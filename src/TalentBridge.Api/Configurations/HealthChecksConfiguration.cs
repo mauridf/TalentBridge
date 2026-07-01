@@ -3,8 +3,14 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace TalentBridge.Api.Configurations;
 
+/// <summary>
+/// Configuração de Health Checks para monitoramento da aplicação
+/// </summary>
 public static class HealthChecksConfiguration
 {
+    /// <summary>
+    /// Adiciona serviços de Health Check ao container de DI
+    /// </summary>
     public static IServiceCollection AddHealthChecksConfiguration(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -13,7 +19,7 @@ public static class HealthChecksConfiguration
 
         services.AddHealthChecks()
             .AddNpgSql(
-                npgsqlConnectionString: connectionString!,
+                connectionString: connectionString!,
                 name: "PostgreSQL",
                 tags: new[] { "database", "postgres" })
             .AddCheck("Self", () =>
@@ -23,6 +29,9 @@ public static class HealthChecksConfiguration
         return services;
     }
 
+    /// <summary>
+    /// Mapeia os endpoints de Health Check
+    /// </summary>
     public static IEndpointRouteBuilder MapHealthChecksConfiguration(
         this IEndpointRouteBuilder app)
     {

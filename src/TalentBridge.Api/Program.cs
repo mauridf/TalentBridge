@@ -1,3 +1,4 @@
+using Scalar.AspNetCore;
 using Serilog;
 using TalentBridge.Api.Configurations;
 using TalentBridge.Infrastructure.Data;
@@ -51,12 +52,7 @@ try
     var app = builder.Build();
 
     // ==========================================
-    // 3. Executar Migrations (antes dos middlewares)
-    // ==========================================
-    app.UseDbUpMigrations();
-
-    // ==========================================
-    // 4. Pipeline de Middlewares
+    // 3. Pipeline de Middlewares
     // ==========================================
 
     app.UseSerilogRequestLogging(options =>
@@ -64,11 +60,15 @@ try
         options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} respondeu {StatusCode} em {Elapsed:0.0000}ms";
     });
 
+    // Executar Migrations (antes dos middlewares)
+    app.UseDbUpMigrations();
+
     // Documentação da API (Development only)
     if (app.Environment.IsDevelopment())
     {
         app.MapOpenApi();
-        app.MapScalar();
+        // Scalar - mapeia para /scalar/v1
+        app.MapScalarApiReference();
         Log.Information("📚 Scalar disponível em /scalar/v1");
     }
 
@@ -87,7 +87,13 @@ try
         Version = "1.0.0",
         Status = "Online",
         Environment = app.Environment.EnvironmentName,
-        Documentation = app.Environment.IsDevelopment() ? "/scalar/v1" : "Not available in production"
+        Documentation = app.Environment.IsDevelopment() ? "/scalar/v1" : "Not available in production",
+        Endpoints = new
+        {
+            Health = "/health",
+            HealthReady = "/health/ready",
+            HealthDatabase = "/health/database"
+        }
     }));
 
     Log.Information("✅ TalentBridge API iniciada com sucesso!");
