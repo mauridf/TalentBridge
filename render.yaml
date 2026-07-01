@@ -1,0 +1,41 @@
+services:
+  # API
+  - type: web
+    name: talentbridge-api
+    env: docker
+    region: oregon
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: talentbridge-db
+          property: connectionString
+      - key: JwtSettings__Secret
+        generateValue: true
+      - key: JwtSettings__Issuer
+        value: TalentBridge
+      - key: JwtSettings__Audience
+        value: TalentBridge
+
+  # Banco de Dados
+  - type: pserv
+    name: talentbridge-db
+    env: docker
+    plan: free
+    repo: https://github.com/render-oss/docker-postgres
+    region: oregon
+    envVars:
+      - key: POSTGRES_DB
+        value: talentbridge
+      - key: POSTGRES_USER
+        value: talentbridge_user
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+    disk:
+      name: talentbridge-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1

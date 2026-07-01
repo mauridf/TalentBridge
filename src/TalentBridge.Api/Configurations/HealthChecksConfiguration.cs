@@ -22,9 +22,22 @@ public static class HealthChecksConfiguration
                 connectionString: connectionString!,
                 name: "PostgreSQL",
                 tags: new[] { "database", "postgres" })
+            .AddUrlGroup(
+                new Uri("https://viacep.com.br"),
+                name: "ViaCEP API",
+                tags: new[] { "external", "cep" })
             .AddCheck("Self", () =>
                 Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(),
-                tags: new[] { "api" });
+                tags: new[] { "api" })
+            .AddCheck("Memory", () =>
+                        {
+                            var memory = GC.GetTotalMemory(false);
+                            var threshold = 1024 * 1024 * 500; // 500MB
+                            return memory < threshold
+                                ? Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy($"Uso de memória: {memory / 1024 / 1024}MB")
+                                : Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Degraded($"Alto uso de memória: {memory / 1024 / 1024}MB");
+                        },
+                tags: new[] { "system" });
 
         return services;
     }

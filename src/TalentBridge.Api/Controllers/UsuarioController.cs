@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using TalentBridge.Application.DTOs.Common;
 using TalentBridge.Application.DTOs.Usuario;
 using TalentBridge.Application.Interfaces;
@@ -27,6 +28,7 @@ public class UsuarioController : ControllerBase
     /// </summary>
     [HttpPost("Autenticar")]
     [AllowAnonymous]
+    [EnableRateLimiting("Auth")]
     public async Task<IActionResult> Autenticar([FromBody] LoginRequestDto request)
     {
         _logger.LogInformation("POST /Usuario/Autenticar - Email: {Email}", request.Email);
