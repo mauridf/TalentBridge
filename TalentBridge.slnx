@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TalentBridge.Api/TalentBridge.Api.csproj" />
+    <Project Path="src/TalentBridge.Application/TalentBridge.Application.csproj" />
+    <Project Path="src/TalentBridge.Domain/TalentBridge.Domain.csproj" />
+    <Project Path="src/TalentBridge.Infrastructure/TalentBridge.Infrastructure.csproj" />
+  </Folder>
+</Solution>
