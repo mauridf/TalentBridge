@@ -5,12 +5,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Candidato\" />
     <Folder Include="DTOs\Candidatura\" />
-    <Folder Include="DTOs\Empresa\" />
     <Folder Include="DTOs\Vaga\" />
     <Folder Include="Mappings\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
 
   <ItemGroup>

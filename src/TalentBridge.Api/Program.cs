@@ -1,3 +1,4 @@
+using FluentValidation;
 using Scalar.AspNetCore;
 using Serilog;
 using TalentBridge.Api.Configurations;
@@ -46,6 +47,11 @@ try
     // Serviços de aplicação
     builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<ICandidatoService, CandidatoService>();
+    builder.Services.AddScoped<IEmpresaService, EmpresaService>();
+
+    // Validators
+    builder.Services.AddValidatorsFromAssembly(typeof(TalentBridge.Application.Services.CandidatoService).Assembly);
 
     // CORS
     builder.Services.AddCorsConfiguration(builder.Configuration);
