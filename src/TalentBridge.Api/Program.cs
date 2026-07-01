@@ -9,6 +9,7 @@ using TalentBridge.Infrastructure.Data;
 using TalentBridge.Infrastructure.Extensions;
 using TalentBridge.Infrastructure.Services;
 using TalentBridge.Api.Configurations;
+using TalentBridge.Application.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,9 +51,12 @@ try
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<ICandidatoService, CandidatoService>();
     builder.Services.AddScoped<IEmpresaService, EmpresaService>();
+    builder.Services.AddScoped<IVagaService, VagaService>();
 
     // Validators
-    builder.Services.AddValidatorsFromAssembly(typeof(TalentBridge.Application.Services.CandidatoService).Assembly);
+    builder.Services.AddValidatorsFromAssembly(typeof(CandidatoService).Assembly);
+    builder.Services.AddValidatorsFromAssembly(typeof(EmpresaService).Assembly);
+    builder.Services.AddValidatorsFromAssembly(typeof(VagaService).Assembly);
 
     // CORS
     builder.Services.AddCorsConfiguration(builder.Configuration);
