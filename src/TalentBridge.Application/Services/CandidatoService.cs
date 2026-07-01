@@ -235,7 +235,11 @@ public class CandidatoService : ICandidatoService
         if (candidato.PerfilPessoalId.HasValue)
         {
             // Atualizar existente
+            if (!candidato.PerfilPessoalId.HasValue)
+                return Result.Fail<PerfilPessoalResponseDto>("PERFIL_NAO_ENCONTRADO");
+
             perfil = await _unitOfWork.PerfisPessoais.GetByIdAsync(candidato.PerfilPessoalId.Value, cancellationToken);
+
             if (perfil == null)
                 return Result.Fail<PerfilPessoalResponseDto>("PERFIL_NAO_ENCONTRADO");
 
@@ -277,7 +281,11 @@ public class CandidatoService : ICandidatoService
 
         if (candidato.PerfilProfissionalId.HasValue)
         {
+            if (!candidato.PerfilProfissionalId.HasValue)
+                return Result.Fail<PerfilProfissionalResponseDto>("PERFIL_NAO_ENCONTRADO");
+
             perfil = await _unitOfWork.PerfisProfissionais.GetByIdAsync(candidato.PerfilProfissionalId.Value, cancellationToken);
+
             if (perfil == null)
                 return Result.Fail<PerfilProfissionalResponseDto>("PERFIL_NAO_ENCONTRADO");
         }

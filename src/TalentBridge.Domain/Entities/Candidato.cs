@@ -37,10 +37,10 @@ public class Candidato : Usuario
     public DateTime? DataUltimoTesteBigFive { get; private set; }
 
     // Relacionamentos
-    public Guid? PerfilPessoalId { get; private set; }
+    public Guid? PerfilPessoalId { get; set; }
     public PerfilPessoal? PerfilPessoal { get; private set; }
 
-    public Guid? PerfilProfissionalId { get; private set; }
+    public Guid? PerfilProfissionalId { get; set; }
     public PerfilProfissional? PerfilProfissional { get; private set; }
 
     public Guid? ParceiroId { get; set; }
