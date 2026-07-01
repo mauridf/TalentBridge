@@ -111,7 +111,17 @@ public class Endereco : IEquatable<Endereco>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(CEP, Rua, Numero, Bairro, Cidade, Estado, Complemento, Latitude, Longitude);
+        var hash = new HashCode();
+        hash.Add(CEP);
+        hash.Add(Rua);
+        hash.Add(Numero);
+        hash.Add(Bairro);
+        hash.Add(Cidade);
+        hash.Add(Estado);
+        hash.Add(Complemento);
+        hash.Add(Latitude);
+        hash.Add(Longitude);
+        return hash.ToHashCode();
     }
 
     public static bool operator ==(Endereco? left, Endereco? right) => Equals(left, right);
