@@ -26,7 +26,7 @@ public abstract class Usuario : BaseEntity
     /// <summary>
     /// Telefone de contato
     /// </summary>
-    public string? Telefone { get; private set; }
+    public string? Telefone { get; set; }
 
     /// <summary>
     /// Status atual do usuário

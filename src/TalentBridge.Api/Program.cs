@@ -1,13 +1,14 @@
 using FluentValidation;
 using Scalar.AspNetCore;
 using Serilog;
-using TalentBridge.Api.Configurations;
+using TalentBridge.Domain.Configurations;
 using TalentBridge.Api.Middlewares;
 using TalentBridge.Application.Interfaces;
 using TalentBridge.Application.Services;
 using TalentBridge.Infrastructure.Data;
 using TalentBridge.Infrastructure.Extensions;
 using TalentBridge.Infrastructure.Services;
+using TalentBridge.Api.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 

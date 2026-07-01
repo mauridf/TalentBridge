@@ -25,6 +25,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<Pedido> Pedidos { get; }
     IRepository<PerfilPessoal> PerfisPessoais { get; }
     IRepository<PerfilProfissional> PerfisProfissionais { get; }
+    IRepository<Recrutador> Recrutadores { get; }
 
     /// <summary>
     /// Salva todas as mudanças no banco de dados

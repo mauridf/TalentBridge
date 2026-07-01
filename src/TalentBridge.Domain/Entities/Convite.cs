@@ -15,22 +15,22 @@ public class Convite : BaseEntity
     /// <summary>
     /// CNPJ da empresa
     /// </summary>
-    public string? Cnpj { get; private set; }
+    public string? Cnpj { get; set; }
 
     /// <summary>
     /// Nome da empresa
     /// </summary>
-    public string? NomeEmpresa { get; private set; }
+    public string? NomeEmpresa { get; set; }
 
     /// <summary>
     /// Nome do responsável
     /// </summary>
-    public string? NomeResponsavel { get; private set; }
+    public string? NomeResponsavel { get; set; }
 
     /// <summary>
     /// Telefone de contato
     /// </summary>
-    public string? Telefone { get; private set; }
+    public string? Telefone { get; set; }
 
     /// <summary>
     /// Status do convite
@@ -68,13 +68,25 @@ public class Convite : BaseEntity
 
     protected Convite() { }
 
-    public Convite(string email, TipoConviteEnum tipo, Guid empresaResponsavelId, int diasExpiracao = 7)
+    public Convite(
+    string email,
+    TipoConviteEnum tipo,
+    Guid empresaResponsavelId,
+    int diasExpiracao = 7,
+    string? cnpj = null,
+    string? nomeEmpresa = null,
+    string? nomeResponsavel = null,
+    string? telefone = null)
     {
         Email = email.ToLowerInvariant().Trim();
         Tipo = tipo;
         EmpresaResponsavelId = empresaResponsavelId;
         Token = Guid.NewGuid();
         DataExpiracao = DateTime.UtcNow.AddDays(diasExpiracao);
+        Cnpj = cnpj;
+        NomeEmpresa = nomeEmpresa;
+        NomeResponsavel = nomeResponsavel;
+        Telefone = telefone;
     }
 
     /// <summary>

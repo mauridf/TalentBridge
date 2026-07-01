@@ -10,7 +10,7 @@ public class Candidato : Usuario
     /// <summary>
     /// Nome social do candidato (opcional)
     /// </summary>
-    public string? NomeSocial { get; private set; }
+    public string? NomeSocial { get; set; }
 
     /// <summary>
     /// Data de nascimento
@@ -43,7 +43,7 @@ public class Candidato : Usuario
     public Guid? PerfilProfissionalId { get; private set; }
     public PerfilProfissional? PerfilProfissional { get; private set; }
 
-    public Guid? ParceiroId { get; private set; }
+    public Guid? ParceiroId { get; set; }
     public Parceiro? Parceiro { get; private set; }
 
     public ICollection<Candidatura> Candidaturas { get; private set; } = new List<Candidatura>();

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TalentBridge.Domain.Configurations;
 
 namespace TalentBridge.Api.Configurations;
 

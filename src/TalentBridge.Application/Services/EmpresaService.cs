@@ -188,7 +188,11 @@ public class EmpresaService : IEmpresaService
             email: request.Email,
             tipo: tipo,
             empresaResponsavelId: empresaId,
-            diasExpiracao: 7);
+            diasExpiracao: 7,
+            cnpj: request.Cnpj,
+            nomeEmpresa: request.NomeEmpresa,
+            nomeResponsavel: request.NomeResponsavel,
+            telefone: request.Telefone);
 
         // Atualizar campos opcionais
         // (Usamos reflexão pois os campos são privados no construtor)

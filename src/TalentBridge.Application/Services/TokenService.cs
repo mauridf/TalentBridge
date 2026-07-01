@@ -4,8 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using TalentBridge.Api.Configurations;
 using TalentBridge.Application.Interfaces;
+using TalentBridge.Domain.Configurations;
 using TalentBridge.Domain.Entities;
 
 namespace TalentBridge.Infrastructure.Services;
