@@ -7,21 +7,19 @@
   <ItemGroup>
     <Folder Include="DTOs\Candidato\" />
     <Folder Include="DTOs\Candidatura\" />
-    <Folder Include="DTOs\Common\" />
     <Folder Include="DTOs\Empresa\" />
-    <Folder Include="DTOs\Usuario\" />
     <Folder Include="DTOs\Vaga\" />
-    <Folder Include="Interfaces\" />
     <Folder Include="Mappings\" />
-    <Folder Include="Services\Interfaces\" />
     <Folder Include="Validators\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="FluentResults" Version="3.16.0" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
   </ItemGroup>
 

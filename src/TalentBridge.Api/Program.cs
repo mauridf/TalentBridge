@@ -1,13 +1,17 @@
 using Scalar.AspNetCore;
 using Serilog;
 using TalentBridge.Api.Configurations;
+using TalentBridge.Api.Middlewares;
+using TalentBridge.Application.Interfaces;
+using TalentBridge.Application.Services;
 using TalentBridge.Infrastructure.Data;
 using TalentBridge.Infrastructure.Extensions;
+using TalentBridge.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ==========================================
-// 1. Configurar Serilog (primeiro!)
+// 1. Configurar Serilog
 // ==========================================
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -30,23 +34,32 @@ try
         options.SuppressAsyncSuffixInActionNames = false;
     });
 
-    // Configurações tipadas (Strongly Typed Settings)
-    builder.Services.Configure<JwtSettings>(
-        builder.Configuration.GetSection("JwtSettings"));
+    // Configurações tipadas
+    builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-    // Configurar CORS
+    // Infraestrutura (DbContext, UnitOfWork, Repositories)
+    builder.Services.AddInfrastructure(builder.Configuration);
+
+    // Autenticação JWT
+    builder.Services.AddJwtAuthentication(builder.Configuration);
+
+    // Serviços de aplicação
+    builder.Services.AddScoped<ITokenService, TokenService>();
+    builder.Services.AddScoped<IAuthService, AuthService>();
+
+    // CORS
     builder.Services.AddCorsConfiguration(builder.Configuration);
 
-    // Configurar Swagger/OpenAPI + Scalar
+    // OpenAPI + Scalar
     builder.Services.AddOpenApi();
 
     // Health Checks
     builder.Services.AddHealthChecksConfiguration(builder.Configuration);
 
-    // Registrar DbUpInitializer
+    // DbUpInitializer
     builder.Services.AddSingleton<DbUpInitializer>();
 
-    // Registrar HttpClient para serviços externos
+    // HttpClient
     builder.Services.AddHttpClient();
 
     var app = builder.Build();
@@ -55,19 +68,21 @@ try
     // 3. Pipeline de Middlewares
     // ==========================================
 
+    // Middleware global de exceção
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
     app.UseSerilogRequestLogging(options =>
     {
         options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} respondeu {StatusCode} em {Elapsed:0.0000}ms";
     });
 
-    // Executar Migrations (antes dos middlewares)
+    // Executar Migrations
     app.UseDbUpMigrations();
 
-    // Documentação da API (Development only)
+    // Documentação da API
     if (app.Environment.IsDevelopment())
     {
         app.MapOpenApi();
-        // Scalar - mapeia para /scalar/v1
         app.MapScalarApiReference();
         Log.Information("📚 Scalar disponível em /scalar/v1");
     }
@@ -80,19 +95,19 @@ try
     app.MapControllers();
     app.MapHealthChecksConfiguration();
 
-    // Página inicial informativa
+    // Página inicial
     app.MapGet("/", () => Results.Ok(new
     {
         Api = "TalentBridge API",
         Version = "1.0.0",
         Status = "Online",
         Environment = app.Environment.EnvironmentName,
-        Documentation = app.Environment.IsDevelopment() ? "/scalar/v1" : "Not available in production",
+        Documentation = app.Environment.IsDevelopment() ? "/scalar/v1" : null,
         Endpoints = new
         {
+            Auth = "/Usuario/Autenticar",
             Health = "/health",
-            HealthReady = "/health/ready",
-            HealthDatabase = "/health/database"
+            Scalar = "/scalar/v1"
         }
     }));
 
