@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\TalentBridge.Application\TalentBridge.Application.csproj" />
@@ -27,6 +27,7 @@
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <UserSecretsId>1a6de7db-3759-44e9-b0e6-de64058c3b25</UserSecretsId>
   </PropertyGroup>
 
 </Project>
