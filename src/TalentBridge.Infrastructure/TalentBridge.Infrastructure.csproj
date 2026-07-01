@@ -6,6 +6,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\..\db\migrations\*.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Data\Configurations\" />
     <Folder Include="Data\Interceptors\" />
     <Folder Include="Migrations\" />
