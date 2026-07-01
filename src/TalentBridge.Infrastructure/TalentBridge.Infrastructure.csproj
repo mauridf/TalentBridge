@@ -6,9 +6,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <Folder Include="Data\Configurations\" />
+    <Folder Include="Data\Interceptors\" />
+    <Folder Include="Migrations\" />
     <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
+    <Folder Include="Services\Email\" />
+    <Folder Include="Services\Payment\" />
+    <Folder Include="Services\Storage\" />
   </ItemGroup>
 
   <ItemGroup>
