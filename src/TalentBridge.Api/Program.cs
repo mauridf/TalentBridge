@@ -53,6 +53,7 @@ try
     builder.Services.AddScoped<IEmpresaService, EmpresaService>();
     builder.Services.AddScoped<IVagaService, VagaService>();
     builder.Services.AddScoped<ICandidaturaService, CandidaturaService>();
+    builder.Services.AddScoped<ICreditoService, CreditoService>();
 
     // Validators
     builder.Services.AddValidatorsFromAssembly(typeof(CandidatoService).Assembly);

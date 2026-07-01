@@ -34,6 +34,7 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<Domain.Entities.PerfilPessoal>? _perfisPessoais;
     private IRepository<Domain.Entities.PerfilProfissional>? _perfisProfissionais;
     private IRepository<Domain.Entities.Recrutador>? _recrutadores;
+    private IRepository<Domain.Entities.CreditosEmpresa>? _creditosEmpresas;
 
     public UnitOfWork(TalentBridgeDbContext context)
     {
@@ -93,6 +94,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<Domain.Entities.Recrutador> Recrutadores =>
     _recrutadores ??= new Repository<Domain.Entities.Recrutador>(_context);
+
+    public IRepository<Domain.Entities.CreditosEmpresa> CreditosEmpresas =>
+    _creditosEmpresas ??= new Repository<Domain.Entities.CreditosEmpresa>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
