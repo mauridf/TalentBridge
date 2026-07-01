@@ -54,6 +54,7 @@ try
     builder.Services.AddScoped<IVagaService, VagaService>();
     builder.Services.AddScoped<ICandidaturaService, CandidaturaService>();
     builder.Services.AddScoped<ICreditoService, CreditoService>();
+    builder.Services.AddScoped<IDashboardService, DashboardService>();
 
     // Validators
     builder.Services.AddValidatorsFromAssembly(typeof(CandidatoService).Assembly);
