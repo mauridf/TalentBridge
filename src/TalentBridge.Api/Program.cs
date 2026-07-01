@@ -55,6 +55,12 @@ try
     builder.Services.AddScoped<ICandidaturaService, CandidaturaService>();
     builder.Services.AddScoped<ICreditoService, CreditoService>();
     builder.Services.AddScoped<IDashboardService, DashboardService>();
+    builder.Services.AddScoped<ILandingPageService, LandingPageService>();
+    builder.Services.AddScoped<IDominioService, DominioService>();
+    builder.Services.AddScoped<ViaCepService>();
+
+    // HttpClient para ViaCepService
+    builder.Services.AddHttpClient<ViaCepService>();
 
     // Validators
     builder.Services.AddValidatorsFromAssembly(typeof(CandidatoService).Assembly);
