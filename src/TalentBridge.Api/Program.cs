@@ -8,6 +8,8 @@ using TalentBridge.Application.Services;
 using TalentBridge.Infrastructure.Data;
 using TalentBridge.Infrastructure.Extensions;
 using TalentBridge.Infrastructure.Services;
+using TalentBridge.Infrastructure.Services.Email;
+using TalentBridge.Infrastructure.Services.External;
 using TalentBridge.Api.Configurations;
 using TalentBridge.Application.Validators;
 
@@ -57,10 +59,37 @@ try
     builder.Services.AddScoped<IDashboardService, DashboardService>();
     builder.Services.AddScoped<ILandingPageService, LandingPageService>();
     builder.Services.AddScoped<IDominioService, DominioService>();
+    builder.Services.AddScoped<IConviteService, ConviteService>();
+    builder.Services.AddScoped<ICupomService, CupomService>();
+    builder.Services.AddScoped<ICompetenciaService, CompetenciaService>();
+    builder.Services.AddScoped<IPedidoService, PedidoService>();
+    builder.Services.AddScoped<IAdminService, AdminService>();
+    builder.Services.AddScoped<IFiltroService, FiltroService>();
+    builder.Services.AddScoped<IParametrosGeraisService, ParametrosGeraisService>();
+    builder.Services.AddScoped<IExternalService, ExternalService>();
+    builder.Services.AddScoped<IStorageService, StorageService>();
+    builder.Services.AddScoped<IAsaasService, AsaasService>();
+    builder.Services.AddScoped<IWhatsAppService, WhatsAppService>();
+    builder.Services.AddScoped<IAnaliseComportamentalService, AnaliseComportamentalService>();
+    builder.Services.AddScoped<IGoogleJobsService, GoogleJobsService>();
+    builder.Services.AddScoped<IFeedService, FeedService>();
+    builder.Services.AddScoped<IEmailService, EmailService>();
+    builder.Services.AddScoped<IVisitCounterService, VisitCounterService>();
+    builder.Services.AddScoped<IConversionTrackingService, ConversionTrackingService>();
     builder.Services.AddScoped<ViaCepService>();
 
-    // HttpClient para ViaCepService
+    // Serviços de infraestrutura (MinIO, Asaas, OpenAI, Geocoding, IBGE, WhatsApp, GoogleJobs)
+    builder.Services.AddInfrastructureServices(builder.Configuration);
+
+    // HttpClients para serviços externos
     builder.Services.AddHttpClient<ViaCepService>();
+    builder.Services.AddHttpClient<GeocodingService>();
+    builder.Services.AddHttpClient<IBGEService>();
+    builder.Services.AddHttpClient("AsaasClient", client =>
+    {
+        client.BaseAddress = new Uri(builder.Configuration["Asaas:BaseUrl"] ?? "https://sandbox.asaas.com/api/v3/");
+        client.DefaultRequestHeaders.Add("access_token", builder.Configuration["Asaas:ApiKey"] ?? "");
+    });
 
     // Validators
     builder.Services.AddValidatorsFromAssembly(typeof(CandidatoService).Assembly);

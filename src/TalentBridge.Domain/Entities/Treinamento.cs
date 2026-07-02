@@ -21,6 +21,12 @@ public class Treinamento : BaseEntity
     // Relacionamento com Competências
     public ICollection<CompetenciaTreinamento> CompetenciasTreinamentos { get; private set; } = new List<CompetenciaTreinamento>();
 
+    // Módulos e conteúdos do curso
+    public ICollection<ModuloCurso> ModulosCursos { get; private set; } = new List<ModuloCurso>();
+
+    // Itens incluídos no treinamento
+    public ICollection<ItemIncluido> ItensIncluidos { get; private set; } = new List<ItemIncluido>();
+
     protected Treinamento() { }
 
     public Treinamento(string nomeCurso, int duracaoMinutos)

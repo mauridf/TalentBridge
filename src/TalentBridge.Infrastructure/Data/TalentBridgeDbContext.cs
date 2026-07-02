@@ -73,6 +73,18 @@ public class TalentBridgeDbContext : DbContext
     public DbSet<Dominio> Dominios => Set<Dominio>();
     public DbSet<Treinamento> Treinamentos => Set<Treinamento>();
 
+    // Contatos
+    public DbSet<Contato> Contatos => Set<Contato>();
+
+    // Treinamento com módulos e conteúdos
+    public DbSet<ModuloCurso> ModulosCursos => Set<ModuloCurso>();
+    public DbSet<ConteudoModulo> ConteudosModulos => Set<ConteudoModulo>();
+    public DbSet<ItemIncluido> ItensIncluidos => Set<ItemIncluido>();
+
+    // Configurações e logs
+    public DbSet<ParametrosGerais> ParametrosGerais => Set<ParametrosGerais>();
+    public DbSet<ApiLog> ApiLogs => Set<ApiLog>();
+
     // Outros
     public DbSet<RedefinicaoSenha> RedefinicoesSenha => Set<RedefinicaoSenha>();
 

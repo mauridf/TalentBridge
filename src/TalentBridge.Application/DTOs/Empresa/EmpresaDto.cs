@@ -1,6 +1,18 @@
 namespace TalentBridge.Application.DTOs.Empresa;
 
 /// <summary>
+/// Resposta com dados da empresa
+/// </summary>
+public class EmpresaResponseDto
+{
+    public Guid Id { get; set; }
+    public string Nome { get; set; } = string.Empty;
+    public string Cnpj { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Telefone { get; set; } = string.Empty;
+}
+
+/// <summary>
 /// Requisição para criar uma empresa com gestor (via convite)
 /// </summary>
 public class CriarEmpresaRequestDto
