@@ -40,7 +40,28 @@ CREATE TABLE IF NOT EXISTS "Gestores" (
 CREATE INDEX IF NOT EXISTS "IX_Gestores_EmpresaId" ON "Gestores"("EmpresaId");
 
 -- =============================================
--- 3. Tabela: Recrutadores (TPH - herda de Usuarios)
+-- 3. Tabela: Convites
+-- =============================================
+CREATE TABLE IF NOT EXISTS "Convites" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "Email" VARCHAR(200) NOT NULL,
+    "Cnpj" VARCHAR(14) NULL,
+    "NomeEmpresa" VARCHAR(128) NULL,
+    "NomeResponsavel" VARCHAR(128) NULL,
+    "Telefone" VARCHAR(20) NULL,
+    "Status" INTEGER NOT NULL DEFAULT 0,
+    "Tipo" INTEGER NOT NULL,
+    "Token" UUID NOT NULL DEFAULT uuid_generate_v4(),
+    "DataExpiracao" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "DataAceite" TIMESTAMP WITH TIME ZONE NULL,
+    "EmpresaResponsavelId" UUID NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_Convites_EmpresaResponsavel" FOREIGN KEY ("EmpresaResponsavelId") REFERENCES "Empresas"("Id")
+);
+
+-- =============================================
+-- 4. Tabela: Recrutadores (TPH - herda de Usuarios)
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Recrutadores" (
     "Id" UUID PRIMARY KEY,
@@ -57,7 +78,7 @@ CREATE TABLE IF NOT EXISTS "Recrutadores" (
 CREATE INDEX IF NOT EXISTS "IX_Recrutadores_EmpresaId" ON "Recrutadores"("EmpresaId");
 
 -- =============================================
--- 4. Tabela: Vagas
+-- 5. Tabela: Vagas
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Vagas" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -124,7 +145,7 @@ CREATE INDEX IF NOT EXISTS "IX_Vagas_Estado" ON "Vagas"("Estado");
 CREATE INDEX IF NOT EXISTS "IX_Vagas_DataCandidaturaFim" ON "Vagas"("DataCandidaturaFim");
 
 -- =============================================
--- 5. Tabela: Candidaturas
+-- 6. Tabela: Candidaturas
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Candidaturas" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -386,27 +407,6 @@ CREATE TABLE IF NOT EXISTS "Cupons" (
     "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     CONSTRAINT "FK_Cupons_Parceiros" FOREIGN KEY ("ParceiroId") REFERENCES "Parceiros"("Id") ON DELETE SET NULL
-);
-
--- =============================================
--- 20. Tabela: Convites
--- =============================================
-CREATE TABLE IF NOT EXISTS "Convites" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "Email" VARCHAR(200) NOT NULL,
-    "Cnpj" VARCHAR(14) NULL,
-    "NomeEmpresa" VARCHAR(128) NULL,
-    "NomeResponsavel" VARCHAR(128) NULL,
-    "Telefone" VARCHAR(20) NULL,
-    "Status" INTEGER NOT NULL DEFAULT 0,
-    "Tipo" INTEGER NOT NULL,
-    "Token" UUID NOT NULL DEFAULT uuid_generate_v4(),
-    "DataExpiracao" TIMESTAMP WITH TIME ZONE NOT NULL,
-    "DataAceite" TIMESTAMP WITH TIME ZONE NULL,
-    "EmpresaResponsavelId" UUID NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_Convites_EmpresaResponsavel" FOREIGN KEY ("EmpresaResponsavelId") REFERENCES "Empresas"("Id")
 );
 
 -- =============================================
