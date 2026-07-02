@@ -170,7 +170,7 @@ CREATE INDEX IF NOT EXISTS "IX_Candidaturas_VagaId" ON "Candidaturas"("VagaId");
 CREATE INDEX IF NOT EXISTS "IX_Candidaturas_CandidatoId" ON "Candidaturas"("CandidatoId");
 
 -- =============================================
--- 6. Tabela: Visitas
+-- 7. Tabela: Visitas
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Visitas" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS "Visitas" (
 );
 
 -- =============================================
--- 7. Tabela: PerfisPessoais
+-- 8. Tabela: PerfisPessoais
 -- =============================================
 CREATE TABLE IF NOT EXISTS "PerfisPessoais" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS "PerfisPessoais" (
 CREATE UNIQUE INDEX IF NOT EXISTS "IX_PerfisPessoais_Cpf" ON "PerfisPessoais"("Cpf") WHERE "Cpf" IS NOT NULL;
 
 -- =============================================
--- 8. Tabela: PerfisProfissionais
+-- 9. Tabela: PerfisProfissionais
 -- =============================================
 CREATE TABLE IF NOT EXISTS "PerfisProfissionais" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -230,142 +230,7 @@ CREATE TABLE IF NOT EXISTS "PerfisProfissionais" (
 );
 
 -- =============================================
--- 9. Tabela: FormacoesAcademicas
--- =============================================
-CREATE TABLE IF NOT EXISTS "FormacoesAcademicas" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "PerfilProfissionalId" UUID NOT NULL,
-    "Grau" VARCHAR(100) NOT NULL,
-    "AreaAtuacao" VARCHAR(100) NOT NULL,
-    "DataConclusao" TIMESTAMP WITH TIME ZONE NULL,
-    "Concluido" BOOLEAN NOT NULL DEFAULT FALSE,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_FormacoesAcademicas_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
-        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE
-);
-
--- =============================================
--- 10. Tabela: ExperienciasProfissionais
--- =============================================
-CREATE TABLE IF NOT EXISTS "ExperienciasProfissionais" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "PerfilProfissionalId" UUID NOT NULL,
-    "Empresa" VARCHAR(200) NOT NULL,
-    "Posicao" VARCHAR(200) NOT NULL,
-    "DataInicio" TIMESTAMP WITH TIME ZONE NOT NULL,
-    "DataFim" TIMESTAMP WITH TIME ZONE NULL,
-    "EmpregoAtual" BOOLEAN NOT NULL DEFAULT FALSE,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_ExperienciasProfissionais_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
-        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE
-);
-
--- =============================================
--- 11. Tabela: Competencias
--- =============================================
-CREATE TABLE IF NOT EXISTS "Competencias" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "Nome" VARCHAR(100) NOT NULL,
-    "EmpresaId" UUID NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_Competencias_Empresas" FOREIGN KEY ("EmpresaId") REFERENCES "Empresas"("Id") ON DELETE SET NULL
-);
-
--- =============================================
--- 12. Tabela: CompetenciasVagas
--- =============================================
-CREATE TABLE IF NOT EXISTS "CompetenciasVagas" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "VagaId" UUID NOT NULL,
-    "CompetenciaId" UUID NOT NULL,
-    "Nivel" INTEGER NOT NULL,
-    "Peso" INTEGER NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_CompetenciasVagas_Vagas" FOREIGN KEY ("VagaId") REFERENCES "Vagas"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_CompetenciasVagas_Competencias" FOREIGN KEY ("CompetenciaId") REFERENCES "Competencias"("Id") ON DELETE CASCADE
-);
-
--- =============================================
--- 13. Tabela: CompetenciasCandidatos
--- =============================================
-CREATE TABLE IF NOT EXISTS "CompetenciasCandidatos" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "PerfilProfissionalId" UUID NOT NULL,
-    "CompetenciaId" UUID NOT NULL,
-    "Nivel" INTEGER NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_CompetenciasCandidatos_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
-        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_CompetenciasCandidatos_Competencias" FOREIGN KEY ("CompetenciaId")
-        REFERENCES "Competencias"("Id") ON DELETE CASCADE
-);
-
--- =============================================
--- 14. Tabela: CompetenciasTreinamentos
--- =============================================
-CREATE TABLE IF NOT EXISTS "CompetenciasTreinamentos" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "TreinamentoId" UUID NOT NULL,
-    "CompetenciaId" UUID NOT NULL,
-    "Nivel" INTEGER NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_CompetenciasTreinamentos_Treinamentos" FOREIGN KEY ("TreinamentoId")
-        REFERENCES "Treinamentos"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_CompetenciasTreinamentos_Competencias" FOREIGN KEY ("CompetenciaId")
-        REFERENCES "Competencias"("Id") ON DELETE CASCADE
-);
-
--- =============================================
--- 15. Tabela: Cursos
--- =============================================
-CREATE TABLE IF NOT EXISTS "Cursos" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "PerfilProfissionalId" UUID NOT NULL,
-    "VagaId" UUID NULL,
-    "NomeCurso" VARCHAR(50) NOT NULL,
-    "DataConclusao" TIMESTAMP WITH TIME ZONE NULL,
-    "Concluido" BOOLEAN NOT NULL DEFAULT FALSE,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_Cursos_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
-        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_Cursos_Vagas" FOREIGN KEY ("VagaId") REFERENCES "Vagas"("Id") ON DELETE SET NULL
-);
-
--- =============================================
--- 16. Tabela: AreasInteresse
--- =============================================
-CREATE TABLE IF NOT EXISTS "AreasInteresse" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "Codigo" INTEGER NOT NULL UNIQUE,
-    "Nome" VARCHAR(100) NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
--- =============================================
--- 17. Tabela: AreasInteressePerfisProfissionais (N:N)
--- =============================================
-CREATE TABLE IF NOT EXISTS "AreasInteressePerfisProfissionais" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "AreaInteresseId" UUID NOT NULL,
-    "PerfilProfissionalId" UUID NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_AreasInt_PerfisProf_AreaInteresse" FOREIGN KEY ("AreaInteresseId")
-        REFERENCES "AreasInteresse"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_AreasInt_PerfisProf_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
-        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE,
-    CONSTRAINT "UQ_AreaInteressePerfilProfissional" UNIQUE ("AreaInteresseId", "PerfilProfissionalId")
-);
-
--- =============================================
--- 18. Tabela: Parceiros
+-- 10. Tabela: Parceiros
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Parceiros" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -395,7 +260,205 @@ CREATE TABLE IF NOT EXISTS "Parceiros" (
 );
 
 -- =============================================
--- 19. Tabela: Cupons
+-- 11. Tabela: AreasInteresse
+-- =============================================
+CREATE TABLE IF NOT EXISTS "AreasInteresse" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "Codigo" INTEGER NOT NULL UNIQUE,
+    "Nome" VARCHAR(100) NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- =============================================
+-- 12. Tabela: Produtos
+-- =============================================
+CREATE TABLE IF NOT EXISTS "Produtos" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "NomeProduto" VARCHAR(150) NOT NULL,
+    "DescricaoProduto" VARCHAR(300) NULL,
+    "ValorProduto" DECIMAL(18,2) NOT NULL,
+    "QuantidadeCandidatos" INTEGER NULL,
+    "QuantidadeCreditoPorVaga" INTEGER NOT NULL DEFAULT 1,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- =============================================
+-- 13. Tabela: Treinamentos
+-- =============================================
+CREATE TABLE IF NOT EXISTS "Treinamentos" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "NomeCurso" VARCHAR(200) NOT NULL,
+    "Categoria" VARCHAR(100) NULL,
+    "Nivel" VARCHAR(50) NULL,
+    "Descricao" VARCHAR(2000) NULL,
+    "ResultadosAprendizagem" VARCHAR(2000) NULL,
+    "Criador" VARCHAR(100) NULL,
+    "Avaliacao" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "QuantidadeAvaliacoes" INTEGER NOT NULL DEFAULT 0,
+    "DuracaoMinutos" INTEGER NOT NULL DEFAULT 0,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- =============================================
+-- 14. Tabela: ParametrosGerais
+-- =============================================
+CREATE TABLE IF NOT EXISTS "ParametrosGerais" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "Chave" VARCHAR(100) NOT NULL UNIQUE,
+    "Valor" VARCHAR(500) NOT NULL,
+    "Descricao" VARCHAR(500) NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- =============================================
+-- 15. Tabela: ApiLogs
+-- =============================================
+CREATE TABLE IF NOT EXISTS "ApiLogs" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "Metodo" VARCHAR(10) NOT NULL,
+    "Rota" VARCHAR(500) NOT NULL,
+    "StatusCode" INTEGER NOT NULL,
+    "DuracaoMs" BIGINT NOT NULL DEFAULT 0,
+    "Ip" VARCHAR(50) NULL,
+    "UserAgent" VARCHAR(500) NULL,
+    "UsuarioId" UUID NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS "IX_ApiLogs_CreatedAt" ON "ApiLogs"("CreatedAt");
+CREATE INDEX IF NOT EXISTS "IX_ApiLogs_StatusCode" ON "ApiLogs"("StatusCode");
+
+-- =============================================
+-- 16. Tabela: FormacoesAcademicas
+-- =============================================
+CREATE TABLE IF NOT EXISTS "FormacoesAcademicas" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "PerfilProfissionalId" UUID NOT NULL,
+    "Grau" VARCHAR(100) NOT NULL,
+    "AreaAtuacao" VARCHAR(100) NOT NULL,
+    "DataConclusao" TIMESTAMP WITH TIME ZONE NULL,
+    "Concluido" BOOLEAN NOT NULL DEFAULT FALSE,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_FormacoesAcademicas_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
+        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE
+);
+
+-- =============================================
+-- 17. Tabela: ExperienciasProfissionais
+-- =============================================
+CREATE TABLE IF NOT EXISTS "ExperienciasProfissionais" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "PerfilProfissionalId" UUID NOT NULL,
+    "Empresa" VARCHAR(200) NOT NULL,
+    "Posicao" VARCHAR(200) NOT NULL,
+    "DataInicio" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "DataFim" TIMESTAMP WITH TIME ZONE NULL,
+    "EmpregoAtual" BOOLEAN NOT NULL DEFAULT FALSE,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_ExperienciasProfissionais_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
+        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE
+);
+
+-- =============================================
+-- 18. Tabela: Competencias
+-- =============================================
+CREATE TABLE IF NOT EXISTS "Competencias" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "Nome" VARCHAR(100) NOT NULL,
+    "EmpresaId" UUID NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_Competencias_Empresas" FOREIGN KEY ("EmpresaId") REFERENCES "Empresas"("Id") ON DELETE SET NULL
+);
+
+-- =============================================
+-- 19. Tabela: CompetenciasVagas
+-- =============================================
+CREATE TABLE IF NOT EXISTS "CompetenciasVagas" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "VagaId" UUID NOT NULL,
+    "CompetenciaId" UUID NOT NULL,
+    "Nivel" INTEGER NOT NULL,
+    "Peso" INTEGER NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_CompetenciasVagas_Vagas" FOREIGN KEY ("VagaId") REFERENCES "Vagas"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_CompetenciasVagas_Competencias" FOREIGN KEY ("CompetenciaId") REFERENCES "Competencias"("Id") ON DELETE CASCADE
+);
+
+-- =============================================
+-- 20. Tabela: CompetenciasCandidatos
+-- =============================================
+CREATE TABLE IF NOT EXISTS "CompetenciasCandidatos" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "PerfilProfissionalId" UUID NOT NULL,
+    "CompetenciaId" UUID NOT NULL,
+    "Nivel" INTEGER NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_CompetenciasCandidatos_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
+        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_CompetenciasCandidatos_Competencias" FOREIGN KEY ("CompetenciaId")
+        REFERENCES "Competencias"("Id") ON DELETE CASCADE
+);
+
+-- =============================================
+-- 21. Tabela: CompetenciasTreinamentos
+-- =============================================
+CREATE TABLE IF NOT EXISTS "CompetenciasTreinamentos" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "TreinamentoId" UUID NOT NULL,
+    "CompetenciaId" UUID NOT NULL,
+    "Nivel" INTEGER NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_CompetenciasTreinamentos_Treinamentos" FOREIGN KEY ("TreinamentoId")
+        REFERENCES "Treinamentos"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_CompetenciasTreinamentos_Competencias" FOREIGN KEY ("CompetenciaId")
+        REFERENCES "Competencias"("Id") ON DELETE CASCADE
+);
+
+-- =============================================
+-- 22. Tabela: Cursos
+-- =============================================
+CREATE TABLE IF NOT EXISTS "Cursos" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "PerfilProfissionalId" UUID NOT NULL,
+    "VagaId" UUID NULL,
+    "NomeCurso" VARCHAR(50) NOT NULL,
+    "DataConclusao" TIMESTAMP WITH TIME ZONE NULL,
+    "Concluido" BOOLEAN NOT NULL DEFAULT FALSE,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_Cursos_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
+        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_Cursos_Vagas" FOREIGN KEY ("VagaId") REFERENCES "Vagas"("Id") ON DELETE SET NULL
+);
+
+-- =============================================
+-- 23. Tabela: AreasInteressePerfisProfissionais (N:N)
+-- =============================================
+CREATE TABLE IF NOT EXISTS "AreasInteressePerfisProfissionais" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "AreaInteresseId" UUID NOT NULL,
+    "PerfilProfissionalId" UUID NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_AreasInt_PerfisProf_AreaInteresse" FOREIGN KEY ("AreaInteresseId")
+        REFERENCES "AreasInteresse"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_AreasInt_PerfisProf_PerfilProfissional" FOREIGN KEY ("PerfilProfissionalId")
+        REFERENCES "PerfisProfissionais"("Id") ON DELETE CASCADE,
+    CONSTRAINT "UQ_AreaInteressePerfilProfissional" UNIQUE ("AreaInteresseId", "PerfilProfissionalId")
+);
+
+-- =============================================
+-- 24. Tabela: Cupons
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Cupons" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -410,37 +473,7 @@ CREATE TABLE IF NOT EXISTS "Cupons" (
 );
 
 -- =============================================
--- 21. Tabela: UsuariosEmpresas
--- =============================================
-CREATE TABLE IF NOT EXISTS "UsuariosEmpresas" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "UsuarioId" UUID NOT NULL,
-    "EmpresaId" UUID NOT NULL,
-    "PerfilId" UUID NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_UsuariosEmpresas_Usuarios" FOREIGN KEY ("UsuarioId") REFERENCES "Usuarios"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_UsuariosEmpresas_Empresas" FOREIGN KEY ("EmpresaId") REFERENCES "Empresas"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_UsuariosEmpresas_Perfis" FOREIGN KEY ("PerfilId") REFERENCES "Perfils"("Id"),
-    CONSTRAINT "UQ_UsuarioEmpresa" UNIQUE ("UsuarioId", "EmpresaId")
-);
-
--- =============================================
--- 22. Tabela: Produtos
--- =============================================
-CREATE TABLE IF NOT EXISTS "Produtos" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "NomeProduto" VARCHAR(150) NOT NULL,
-    "DescricaoProduto" VARCHAR(300) NULL,
-    "ValorProduto" DECIMAL(18,2) NOT NULL,
-    "QuantidadeCandidatos" INTEGER NULL,
-    "QuantidadeCreditoPorVaga" INTEGER NOT NULL DEFAULT 1,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
--- =============================================
--- 23. Tabela: CreditosEmpresas
+-- 25. Tabela: CreditosEmpresas
 -- =============================================
 CREATE TABLE IF NOT EXISTS "CreditosEmpresas" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -455,7 +488,34 @@ CREATE TABLE IF NOT EXISTS "CreditosEmpresas" (
 );
 
 -- =============================================
--- 24. Tabela: CreditoVagas
+-- 26. Tabela: Carrinhos
+-- =============================================
+CREATE TABLE IF NOT EXISTS "Carrinhos" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "EmpresaId" UUID NOT NULL,
+    "Status" INTEGER NOT NULL DEFAULT 0,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_Carrinhos_Empresas" FOREIGN KEY ("EmpresaId") REFERENCES "Empresas"("Id")
+);
+
+-- =============================================
+-- 27. Tabela: ItensCarrinho
+-- =============================================
+CREATE TABLE IF NOT EXISTS "ItensCarrinho" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "CarrinhoId" UUID NOT NULL,
+    "ProdutoId" UUID NOT NULL,
+    "Quantidade" INTEGER NOT NULL,
+    "ValorUnitario" DECIMAL(18,2) NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_ItensCarrinho_Carrinhos" FOREIGN KEY ("CarrinhoId") REFERENCES "Carrinhos"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_ItensCarrinho_Produtos" FOREIGN KEY ("ProdutoId") REFERENCES "Produtos"("Id")
+);
+
+-- =============================================
+-- 28. Tabela: CreditoVagas
 -- =============================================
 CREATE TABLE IF NOT EXISTS "CreditoVagas" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -473,34 +533,7 @@ CREATE TABLE IF NOT EXISTS "CreditoVagas" (
 );
 
 -- =============================================
--- 25. Tabela: Carrinhos
--- =============================================
-CREATE TABLE IF NOT EXISTS "Carrinhos" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "EmpresaId" UUID NOT NULL,
-    "Status" INTEGER NOT NULL DEFAULT 0,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_Carrinhos_Empresas" FOREIGN KEY ("EmpresaId") REFERENCES "Empresas"("Id")
-);
-
--- =============================================
--- 26. Tabela: ItensCarrinho
--- =============================================
-CREATE TABLE IF NOT EXISTS "ItensCarrinho" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "CarrinhoId" UUID NOT NULL,
-    "ProdutoId" UUID NOT NULL,
-    "Quantidade" INTEGER NOT NULL,
-    "ValorUnitario" DECIMAL(18,2) NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT "FK_ItensCarrinho_Carrinhos" FOREIGN KEY ("CarrinhoId") REFERENCES "Carrinhos"("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_ItensCarrinho_Produtos" FOREIGN KEY ("ProdutoId") REFERENCES "Produtos"("Id")
-);
-
--- =============================================
--- 27. Tabela: Pedidos
+-- 29. Tabela: Pedidos
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Pedidos" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -519,7 +552,7 @@ CREATE TABLE IF NOT EXISTS "Pedidos" (
 );
 
 -- =============================================
--- 28. Tabela: ItensPedido
+-- 30. Tabela: ItensPedido
 -- =============================================
 CREATE TABLE IF NOT EXISTS "ItensPedido" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -534,7 +567,7 @@ CREATE TABLE IF NOT EXISTS "ItensPedido" (
 );
 
 -- =============================================
--- 29. Tabela: HistoricoTransacoes
+-- 31. Tabela: HistoricoTransacoes
 -- =============================================
 CREATE TABLE IF NOT EXISTS "HistoricoTransacoes" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -557,25 +590,7 @@ CREATE TABLE IF NOT EXISTS "HistoricoTransacoes" (
 );
 
 -- =============================================
--- 30. Tabela: Treinamentos
--- =============================================
-CREATE TABLE IF NOT EXISTS "Treinamentos" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "NomeCurso" VARCHAR(200) NOT NULL,
-    "Categoria" VARCHAR(100) NULL,
-    "Nivel" VARCHAR(50) NULL,
-    "Descricao" VARCHAR(2000) NULL,
-    "ResultadosAprendizagem" VARCHAR(2000) NULL,
-    "Criador" VARCHAR(100) NULL,
-    "Avaliacao" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "QuantidadeAvaliacoes" INTEGER NOT NULL DEFAULT 0,
-    "DuracaoMinutos" INTEGER NOT NULL DEFAULT 0,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
--- =============================================
--- 31. Tabela: TreinamentoVagas (N:N)
+-- 32. Tabela: TreinamentoVagas (N:N)
 -- =============================================
 CREATE TABLE IF NOT EXISTS "TreinamentoVagas" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -590,7 +605,7 @@ CREATE TABLE IF NOT EXISTS "TreinamentoVagas" (
 );
 
 -- =============================================
--- 32. Tabela: ModulosCursos
+-- 33. Tabela: ModulosCursos
 -- =============================================
 CREATE TABLE IF NOT EXISTS "ModulosCursos" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -606,7 +621,7 @@ CREATE TABLE IF NOT EXISTS "ModulosCursos" (
 );
 
 -- =============================================
--- 33. Tabela: ConteudosModulos
+-- 34. Tabela: ConteudosModulos
 -- =============================================
 CREATE TABLE IF NOT EXISTS "ConteudosModulos" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -624,7 +639,7 @@ CREATE TABLE IF NOT EXISTS "ConteudosModulos" (
 );
 
 -- =============================================
--- 34. Tabela: ItensIncluidos
+-- 35. Tabela: ItensIncluidos
 -- =============================================
 CREATE TABLE IF NOT EXISTS "ItensIncluidos" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -637,7 +652,23 @@ CREATE TABLE IF NOT EXISTS "ItensIncluidos" (
 );
 
 -- =============================================
--- 35. Tabela: Contatos
+-- 36. Tabela: UsuariosEmpresas
+-- =============================================
+CREATE TABLE IF NOT EXISTS "UsuariosEmpresas" (
+    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "UsuarioId" UUID NOT NULL,
+    "EmpresaId" UUID NOT NULL,
+    "PerfilId" UUID NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT "FK_UsuariosEmpresas_Usuarios" FOREIGN KEY ("UsuarioId") REFERENCES "Usuarios"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_UsuariosEmpresas_Empresas" FOREIGN KEY ("EmpresaId") REFERENCES "Empresas"("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_UsuariosEmpresas_Perfis" FOREIGN KEY ("PerfilId") REFERENCES "Perfils"("Id"),
+    CONSTRAINT "UQ_UsuarioEmpresa" UNIQUE ("UsuarioId", "EmpresaId")
+);
+
+-- =============================================
+-- 37. Tabela: Contatos
 -- =============================================
 CREATE TABLE IF NOT EXISTS "Contatos" (
     "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -654,32 +685,12 @@ CREATE TABLE IF NOT EXISTS "Contatos" (
 );
 
 -- =============================================
--- 36. Tabela: ParametrosGerais
+-- Foreign Keys da tabela Candidatos
+-- (dependem de PerfisPessoais, PerfisProfissionais e Parceiros)
 -- =============================================
-CREATE TABLE IF NOT EXISTS "ParametrosGerais" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "Chave" VARCHAR(100) NOT NULL UNIQUE,
-    "Valor" VARCHAR(500) NOT NULL,
-    "Descricao" VARCHAR(500) NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
--- =============================================
--- 37. Tabela: ApiLogs
--- =============================================
-CREATE TABLE IF NOT EXISTS "ApiLogs" (
-    "Id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "Metodo" VARCHAR(10) NOT NULL,
-    "Rota" VARCHAR(500) NOT NULL,
-    "StatusCode" INTEGER NOT NULL,
-    "DuracaoMs" BIGINT NOT NULL DEFAULT 0,
-    "Ip" VARCHAR(50) NULL,
-    "UserAgent" VARCHAR(500) NULL,
-    "UsuarioId" UUID NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS "IX_ApiLogs_CreatedAt" ON "ApiLogs"("CreatedAt");
-CREATE INDEX IF NOT EXISTS "IX_ApiLogs_StatusCode" ON "ApiLogs"("StatusCode");
+ALTER TABLE "Candidatos" ADD CONSTRAINT "FK_Candidatos_PerfisPessoais"
+    FOREIGN KEY ("PerfilPessoalId") REFERENCES "PerfisPessoais"("Id") ON DELETE SET NULL;
+ALTER TABLE "Candidatos" ADD CONSTRAINT "FK_Candidatos_PerfisProfissionais"
+    FOREIGN KEY ("PerfilProfissionalId") REFERENCES "PerfisProfissionais"("Id") ON DELETE SET NULL;
+ALTER TABLE "Candidatos" ADD CONSTRAINT "FK_Candidatos_Parceiros"
+    FOREIGN KEY ("ParceiroId") REFERENCES "Parceiros"("Id") ON DELETE SET NULL;
