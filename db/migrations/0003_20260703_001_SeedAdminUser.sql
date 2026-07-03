@@ -18,8 +18,8 @@ DO $$
 DECLARE
     v_admin_perfil_id UUID;
     v_admin_user_id UUID;
-    -- 🔽 Hash BCrypt da senha padrão "Admin@123" (cost factor 11)
-    v_senha_hash TEXT := '$2a$11$HUKuFbJ5FTtwVQ0te7h3nOVaP.6JAALAekY18Hvf3XGLrNxWAxj2a';
+    -- 🔽 Hash BCrypt da senha padrão "Admin@123" (passado via variável DbUp para evitar conflito com $)
+    v_senha_hash TEXT := '$AdminSenhaHash$';
     -- 🔼 Senha padrão: Admin@123 (altere após o primeiro login)
 BEGIN
 

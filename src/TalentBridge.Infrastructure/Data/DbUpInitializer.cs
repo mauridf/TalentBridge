@@ -63,12 +63,16 @@ public class DbUpInitializer
         // Garantir que o banco de dados existe
         EnsureDatabase.For.PostgresqlDatabase(_connectionString);
 
+        // Hash BCrypt da senha do admin (Admin@123, cost factor 11)
+        var adminSenhaHash = "$2a$11$HUKuFbJ5FTtwVQ0te7h3nOVaP.6JAALAekY18Hvf3XGLrNxWAxj2a";
+
         // Configurar o DbUp com scripts do sistema de arquivos
         var upgrader = DeployChanges.To
             .PostgresqlDatabase(_connectionString)
             .WithScriptsFromFileSystem(_scriptsPath)
             .WithTransactionPerScript()
             .LogToConsole()
+            .WithVariable("AdminSenhaHash", adminSenhaHash)
             .Build();
 
         // Verificar se há migrations pendentes
