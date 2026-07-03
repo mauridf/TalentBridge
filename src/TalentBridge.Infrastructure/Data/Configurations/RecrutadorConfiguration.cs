@@ -19,8 +19,8 @@ public class RecrutadorConfiguration : IEntityTypeConfiguration<Recrutador>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(r => r.Convite)
-            .WithMany()
-            .HasForeignKey(r => r.ConviteId)
+            .WithOne(c => c.Recrutador)
+            .HasForeignKey<Recrutador>(r => r.ConviteId)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }
