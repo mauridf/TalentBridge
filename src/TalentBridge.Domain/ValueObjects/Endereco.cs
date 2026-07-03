@@ -6,17 +6,19 @@ namespace TalentBridge.Domain.ValueObjects;
 /// </summary>
 public class Endereco : IEquatable<Endereco>
 {
-    public string? CEP { get; }
-    public string? Rua { get; }
-    public string? Numero { get; }
-    public string? Bairro { get; }
-    public string? Cidade { get; }
-    public string? Estado { get; }
-    public string? Complemento { get; }
-    public double? Latitude { get; }
-    public double? Longitude { get; }
+    public string? CEP { get; private set; }
+    public string? Rua { get; private set; }
+    public string? Numero { get; private set; }
+    public string? Bairro { get; private set; }
+    public string? Cidade { get; private set; }
+    public string? Estado { get; private set; }
+    public string? Complemento { get; private set; }
+    public double? Latitude { get; private set; }
+    public double? Longitude { get; private set; }
 
-    // Construtor privado para forçar uso do método de criação
+    // Construtor sem parâmetros para o EF Core
+    private Endereco() { }
+
     private Endereco(
         string? cep,
         string? rua,
