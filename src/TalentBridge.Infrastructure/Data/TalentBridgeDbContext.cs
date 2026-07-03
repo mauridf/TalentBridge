@@ -97,24 +97,6 @@ public class TalentBridgeDbContext : DbContext
 
         // Aplicar todas as configurações do assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TalentBridgeDbContext).Assembly);
-
-        // ==========================================
-        // Configuração global: nomes de tabela
-        // ==========================================
-        // As tabelas já são nomeadas via DbSet ou configurações específicas
-
-        // ==========================================
-        // Configuração de TPH para Usuario
-        // ==========================================
-        modelBuilder.Entity<Usuario>(entity =>
-        {
-            entity.HasDiscriminator<string>("Discriminator")
-                  .HasValue<Candidato>("Candidato")
-                  .HasValue<Gestor>("Gestor")
-                  .HasValue<Recrutador>("Recrutador");
-
-            entity.ToTable("Usuarios");
-        });
     }
 
     /// <summary>

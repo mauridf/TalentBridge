@@ -8,6 +8,7 @@ public class CandidatoConfiguration : IEntityTypeConfiguration<Candidato>
 {
     public void Configure(EntityTypeBuilder<Candidato> builder)
     {
+        builder.ToTable("Candidatos");
         builder.Property(c => c.NomeSocial)
             .HasMaxLength(100);
 
