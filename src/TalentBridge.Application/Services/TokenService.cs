@@ -34,6 +34,7 @@ public class TokenService : ITokenService
         {
             new("id", usuario.Id.ToString()),
             new("perfil", perfilCodigo),
+            new(ClaimTypes.Role, perfilCodigo),
             new("nome", usuario.Nome),
             new("email", usuario.Email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
