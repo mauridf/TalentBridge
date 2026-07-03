@@ -19,8 +19,9 @@ public class TalentBridgeDbContext : DbContext
     // DbSets - Tabelas do banco de dados
     // ==========================================
 
-    // Usuários (TPH)
+    // Usuários (TPT)
     public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<Admin> Admins => Set<Admin>();
     public DbSet<Candidato> Candidatos => Set<Candidato>();
     public DbSet<Gestor> Gestores => Set<Gestor>();
     public DbSet<Recrutador> Recrutadores => Set<Recrutador>();
