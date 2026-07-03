@@ -43,6 +43,7 @@ public class CriarEmpresaValidator : AbstractValidator<CriarEmpresaRequestDto>
             .NotEmpty().WithMessage("Segmento é obrigatório.");
 
         RuleFor(x => x.TokenConvite)
-            .NotEmpty().WithMessage("Token de convite é obrigatório.");
+            .NotEmpty().WithMessage("Token de convite inválido.")
+            .When(x => x.TokenConvite.HasValue);
     }
 }

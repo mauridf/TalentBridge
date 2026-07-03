@@ -17,15 +17,15 @@ public class Recrutador : Usuario
     public Empresa Empresa { get; private set; } = null!;
 
     /// <summary>
-    /// Convite que originou o cadastro
+    /// Convite que originou o cadastro (opcional — pode ser cadastro direto pelo gestor)
     /// </summary>
-    public Guid ConviteId { get; private set; }
-    public Convite Convite { get; private set; } = null!;
+    public Guid? ConviteId { get; private set; }
+    public Convite? Convite { get; private set; }
 
     protected Recrutador() { }
 
     public Recrutador(string nome, string email, string senhaHash, Guid perfilId,
-        Guid empresaId, Guid conviteId, string? nomeSocial = null)
+        Guid empresaId, Guid? conviteId = null, string? nomeSocial = null)
         : base(nome, email, senhaHash, perfilId, "Recrutador")
     {
         EmpresaId = empresaId;

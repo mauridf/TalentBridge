@@ -51,13 +51,17 @@ public class EmpresaService : IEmpresaService
                 validationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-        // Validar convite
-        var convite = await _unitOfWork.Convites
-            .FindSingleAsync(c => c.Token == request.TokenConvite, cancellationToken: cancellationToken);
-
-        if (convite == null || !convite.EstaValido())
+        // Se tiver token, validar convite
+        Convite? convite = null;
+        if (request.TokenConvite.HasValue)
         {
-            return Result.Fail<CriarEmpresaResponseDto>("CONVITE_INVALIDO");
+            convite = await _unitOfWork.Convites
+                .FindSingleAsync(c => c.Token == request.TokenConvite.Value, cancellationToken: cancellationToken);
+
+            if (convite == null || !convite.EstaValido())
+            {
+                return Result.Fail<CriarEmpresaResponseDto>("CONVITE_INVALIDO");
+            }
         }
 
         // Verificar se email já existe
@@ -96,20 +100,27 @@ public class EmpresaService : IEmpresaService
                 perfilId: PerfilGestorId,
                 empresaId: empresa.Id);
 
-            gestor.Ativar(); // Gestor já é criado ativo
+            gestor.Ativar();
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Vincular usuário à empresa
             var usuarioEmpresa = new UsuarioEmpresa(gestor.Id, empresa.Id, PerfilGestorId);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Aceitar convite
-            convite.Aceitar();
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            // Aceitar convite (se houver)
+            if (convite != null)
+            {
+                convite.Aceitar();
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            _logger.LogInformation("Empresa criada: {Empresa} | Gestor: {Email}", empresa.Nome, request.EmailGestor);
+            _logger.LogInformation(
+                convite != null
+                    ? "Empresa criada via convite: {Empresa} | Gestor: {Email}"
+                    : "Empresa criada (auto-cadastro): {Empresa} | Gestor: {Email}",
+                empresa.Nome, request.EmailGestor);
 
             return Result.Ok(new CriarEmpresaResponseDto
             {

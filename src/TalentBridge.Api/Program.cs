@@ -60,6 +60,7 @@ try
     builder.Services.AddScoped<ILandingPageService, LandingPageService>();
     builder.Services.AddScoped<IDominioService, DominioService>();
     builder.Services.AddScoped<IConviteService, ConviteService>();
+builder.Services.AddScoped<IRecrutadorService, RecrutadorService>();
     builder.Services.AddScoped<ICupomService, CupomService>();
     builder.Services.AddScoped<ICompetenciaService, CompetenciaService>();
     builder.Services.AddScoped<IPedidoService, PedidoService>();

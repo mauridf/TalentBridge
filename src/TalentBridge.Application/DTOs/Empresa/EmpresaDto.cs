@@ -18,9 +18,9 @@ public class EmpresaResponseDto
 public class CriarEmpresaRequestDto
 {
     /// <summary>
-    /// Token do convite
+    /// Token do convite (opcional — pode ser auto-cadastro sem convite)
     /// </summary>
-    public Guid TokenConvite { get; set; }
+    public Guid? TokenConvite { get; set; }
 
     /// <summary>
     /// Nome do gestor
