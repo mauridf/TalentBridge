@@ -17,7 +17,7 @@ public class CompetenciaConfiguration : IEntityTypeConfiguration<Competencia>
             .IsRequired();
 
         builder.HasOne(c => c.Empresa)
-            .WithMany()
+            .WithMany(e => e.Competencias)
             .HasForeignKey(c => c.EmpresaId)
             .OnDelete(DeleteBehavior.SetNull);
 

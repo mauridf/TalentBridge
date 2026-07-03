@@ -13,12 +13,12 @@ public class UsuarioEmpresaConfiguration : IEntityTypeConfiguration<UsuarioEmpre
         builder.HasKey(ue => ue.Id);
 
         builder.HasOne(ue => ue.Usuario)
-            .WithMany()
+            .WithMany(u => u.UsuarioEmpresas)
             .HasForeignKey(ue => ue.UsuarioId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(ue => ue.Empresa)
-            .WithMany()
+            .WithMany(e => e.UsuarioEmpresas)
             .HasForeignKey(ue => ue.EmpresaId)
             .OnDelete(DeleteBehavior.Restrict);
 

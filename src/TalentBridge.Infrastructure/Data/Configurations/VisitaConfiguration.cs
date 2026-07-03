@@ -25,12 +25,12 @@ public class VisitaConfiguration : IEntityTypeConfiguration<Visita>
             .HasMaxLength(100);
 
         builder.HasOne(v => v.Vaga)
-            .WithMany()
+            .WithMany(vg => vg.Visitas)
             .HasForeignKey(v => v.VagaId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(v => v.Candidato)
-            .WithMany()
+            .WithMany(c => c.Visitas)
             .HasForeignKey(v => v.CandidatoId)
             .OnDelete(DeleteBehavior.Restrict);
 

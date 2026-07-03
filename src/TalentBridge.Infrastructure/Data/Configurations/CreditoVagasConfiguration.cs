@@ -21,7 +21,7 @@ public class CreditoVagasConfiguration : IEntityTypeConfiguration<CreditoVagas>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(cv => cv.Vaga)
-            .WithMany()
+            .WithMany(v => v.CreditoVagas)
             .HasForeignKey(cv => cv.VagaId)
             .OnDelete(DeleteBehavior.Restrict);
 

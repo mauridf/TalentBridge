@@ -16,7 +16,7 @@ public class CreditosEmpresaConfiguration : IEntityTypeConfiguration<CreditosEmp
             .IsRequired();
 
         builder.HasOne(ce => ce.Empresa)
-            .WithMany()
+            .WithMany(e => e.CreditosEmpresa)
             .HasForeignKey(ce => ce.EmpresaId)
             .OnDelete(DeleteBehavior.Restrict);
 

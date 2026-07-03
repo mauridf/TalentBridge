@@ -20,7 +20,7 @@ public class ItemPedidoConfiguration : IEntityTypeConfiguration<ItemPedido>
             .IsRequired();
 
         builder.HasOne(ip => ip.Pedido)
-            .WithMany()
+            .WithMany(p => p.ItensPedido)
             .HasForeignKey(ip => ip.PedidoId)
             .OnDelete(DeleteBehavior.Cascade);
 

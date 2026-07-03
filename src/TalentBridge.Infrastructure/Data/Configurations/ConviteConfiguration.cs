@@ -41,7 +41,7 @@ public class ConviteConfiguration : IEntityTypeConfiguration<Convite>
             .IsRequired();
 
         builder.HasOne(c => c.EmpresaResponsavel)
-            .WithMany()
+            .WithMany(e => e.Convites)
             .HasForeignKey(c => c.EmpresaResponsavelId)
             .OnDelete(DeleteBehavior.Restrict);
 
