@@ -34,8 +34,8 @@ public class CriarCandidatoValidator : AbstractValidator<CriarCandidatoRequestDt
 
         RuleFor(x => x.DataNascimento)
             .NotEmpty().WithMessage("Data de nascimento é obrigatória.")
-            .Must(data => data <= DateTime.Now.AddYears(-14)).WithMessage("Candidato deve ter pelo menos 14 anos.")
-            .Must(data => data >= DateTime.Now.AddYears(-120)).WithMessage("Data de nascimento inválida.");
+            .Must(data => data <= DateTime.UtcNow.AddYears(-14)).WithMessage("Candidato deve ter pelo menos 14 anos.")
+            .Must(data => data >= DateTime.UtcNow.AddYears(-120)).WithMessage("Data de nascimento inválida.");
 
         RuleFor(x => x.Telefone)
             .MaximumLength(20).WithMessage("Telefone deve ter no máximo 20 caracteres.");

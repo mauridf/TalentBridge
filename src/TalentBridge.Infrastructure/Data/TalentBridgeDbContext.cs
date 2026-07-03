@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TalentBridge.Domain.Entities;
 using TalentBridge.Infrastructure.Data.Configurations;
 
@@ -98,6 +99,33 @@ public class TalentBridgeDbContext : DbContext
 
         // Aplicar todas as configurações do assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TalentBridgeDbContext).Assembly);
+
+        // Converter global: garante que DateTime com Kind=Unspecified
+        // seja tratado como UTC ao persistir no PostgreSQL (timestamptz)
+        var utcConverter = new ValueConverter<DateTime, DateTime>(
+            v => v.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                : v.ToUniversalTime(),
+            v => v);
+
+        var nullableUtcConverter = new ValueConverter<DateTime?, DateTime?>(
+            v => v.HasValue
+                ? (v.Value.Kind == DateTimeKind.Unspecified
+                    ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                    : v.Value.ToUniversalTime())
+                : v,
+            v => v);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTime))
+                    property.SetValueConverter(utcConverter);
+                else if (property.ClrType == typeof(DateTime?))
+                    property.SetValueConverter(nullableUtcConverter);
+            }
+        }
     }
 
     /// <summary>

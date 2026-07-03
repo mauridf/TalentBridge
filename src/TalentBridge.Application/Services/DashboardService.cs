@@ -213,7 +213,7 @@ public class DashboardService : IDashboardService
         var pedidos = await _unitOfWork.Pedidos.GetAllAsync(cancellationToken: cancellationToken);
         var pedidosList = pedidos.ToList();
 
-        var inicioMes = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var inicioMes = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
         var dashboard = new DashboardAdminResponseDto
         {
