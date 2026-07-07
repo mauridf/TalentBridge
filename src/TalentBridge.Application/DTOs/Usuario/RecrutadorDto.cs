@@ -33,3 +33,14 @@ public class CriarRecrutadorResponseDto
     public string EmpresaNome { get; set; } = string.Empty;
     public string Mensagem { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// DTO para listagem de recrutadores
+/// </summary>
+public class RecrutadorListaDto
+{
+    public Guid Id { get; set; }
+    public string Nome { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+}

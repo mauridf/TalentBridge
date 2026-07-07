@@ -141,4 +141,23 @@ public class RecrutadorService : IRecrutadorService
             Mensagem = "Recrutador adicionado com sucesso!"
         });
     }
+
+    public async Task<ResultadoDto<List<RecrutadorListaDto>>> ListarPorEmpresaAsync(Guid empresaId)
+    {
+        var recrutadores = await _unitOfWork.Recrutadores.FindAsync(
+            r => r.EmpresaId == empresaId);
+
+        var lista = recrutadores.Select(r => new RecrutadorListaDto
+        {
+            Id = r.Id,
+            Nome = r.Nome,
+            Email = r.Email,
+            Status = r.Status.ToString()
+        }).ToList();
+
+        _logger.LogInformation("Listando recrutadores da empresa {EmpresaId}: {Total} encontrados",
+            empresaId, lista.Count);
+
+        return ResultadoDto<List<RecrutadorListaDto>>.Ok(lista);
+    }
 }

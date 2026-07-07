@@ -64,4 +64,22 @@ public class RecrutadorController : ControllerBase
 
         return BadRequest(resultado);
     }
+
+    /// <summary>
+    /// Lista recrutadores da empresa do gestor logado
+    /// </summary>
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Listar()
+    {
+        var empresaIdClaim = User.FindFirst("idEmpresa")?.Value;
+        if (string.IsNullOrEmpty(empresaIdClaim) || !Guid.TryParse(empresaIdClaim, out var empresaId))
+        {
+            return Unauthorized();
+        }
+
+        var resultado = await _recrutadorService.ListarPorEmpresaAsync(empresaId);
+
+        return Ok(resultado);
+    }
 }
