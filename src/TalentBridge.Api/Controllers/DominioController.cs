@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TalentBridge.Application.DTOs.Common;
 using TalentBridge.Application.Interfaces;
 using TalentBridge.Domain.Enums;
 
@@ -27,7 +28,9 @@ public class DominioController : ControllerBase
     public async Task<IActionResult> BuscarPorTipo(TipoDominioEnum tipo)
     {
         var resultado = await _dominioService.BuscarPorTipoAsync(tipo);
-        return Ok(resultado.Value);
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<IEnumerable<DominioDto>>.Ok(resultado.Value))
+            : BadRequest(ResultadoDto<object>.Falha("ERRO_DOMINIO", "Erro ao buscar domínios."));
     }
 
     /// <summary>
@@ -37,6 +40,8 @@ public class DominioController : ControllerBase
     public async Task<IActionResult> BuscarTodos()
     {
         var resultado = await _dominioService.BuscarTodosAsync();
-        return Ok(resultado.Value);
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<Dictionary<string, List<DominioDto>>>.Ok(resultado.Value))
+            : BadRequest(ResultadoDto<object>.Falha("ERRO_DOMINIO", "Erro ao buscar domínios."));
     }
 }

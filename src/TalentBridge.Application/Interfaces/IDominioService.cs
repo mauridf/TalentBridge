@@ -24,8 +24,9 @@ public interface IDominioService
 /// </summary>
 public class DominioDto
 {
+    public Guid Id { get; set; }
     public int Codigo { get; set; }
-    public string Descricao { get; set; } = string.Empty;
-    public string Tipo { get; set; } = string.Empty;
+    public string Nome { get; set; } = string.Empty;
+    public int Tipo { get; set; }
     public bool Ativo { get; set; }
 }

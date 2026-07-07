@@ -27,9 +27,10 @@ public class DominioService : IDominioService
 
         var dtos = dominios.Select(d => new DominioDto
         {
+            Id = d.Id,
             Codigo = d.Codigo,
-            Descricao = d.Descricao,
-            Tipo = d.Tipo.ToString(),
+            Nome = d.Descricao,
+            Tipo = (int)d.Tipo,
             Ativo = d.Status == StatusComumEnum.Ativo
         });
 
@@ -46,12 +47,13 @@ public class DominioService : IDominioService
         var agrupado = todosDominios
             .GroupBy(d => d.Tipo)
             .ToDictionary(
-                g => g.Key.ToString(),
+                g => ((int)g.Key).ToString(),
                 g => g.Select(d => new DominioDto
                 {
+                    Id = d.Id,
                     Codigo = d.Codigo,
-                    Descricao = d.Descricao,
-                    Tipo = d.Tipo.ToString(),
+                    Nome = d.Descricao,
+                    Tipo = (int)d.Tipo,
                     Ativo = true
                 }).ToList());
 
