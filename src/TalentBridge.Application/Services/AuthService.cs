@@ -219,17 +219,11 @@ public class AuthService : IAuthService
         var token = Guid.NewGuid().ToString("N");
         var redefinicao = new RedefinicaoSenha(usuario.Id, token, 3);
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
         {
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-        }
-        catch
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
+            await _unitOfWork.SaveChangesAsync(ct);
+            return Result.Ok();
+        }, cancellationToken);
 
         // TODO: Enviar email com o token
         _logger.LogInformation("Token de recuperação gerado para: {Email}", email);

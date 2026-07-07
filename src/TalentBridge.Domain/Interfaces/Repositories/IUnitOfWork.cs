@@ -48,4 +48,11 @@ public interface IUnitOfWork : IDisposable
     /// Desfaz a transação atual
     /// </summary>
     Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Executa uma operação dentro de uma transação com suporte a retry.
+    /// Use este método em vez de BeginTransactionAsync/CommitTransactionAsync/RollbackTransactionAsync
+    /// quando o NpgsqlRetryingExecutionStrategy estiver habilitado.
+    /// </summary>
+    Task<T> ExecuteInTransactionAsync<T>(Func<CancellationToken, Task<T>> operation, CancellationToken cancellationToken = default);
 }

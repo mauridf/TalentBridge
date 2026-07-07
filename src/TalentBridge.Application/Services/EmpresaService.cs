@@ -77,8 +77,7 @@ public class EmpresaService : IEmpresaService
             return Result.Fail<CriarEmpresaResponseDto>("CNPJ_JA_CADASTRADO");
         }
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        return await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
         {
             // Criar empresa
             var empresa = new Empresa(
@@ -88,8 +87,8 @@ public class EmpresaService : IEmpresaService
                 telefone: request.TelefoneEmpresa,
                 segmentoId: request.SegmentoId);
 
-            await _unitOfWork.Empresas.AddAsync(empresa, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.Empresas.AddAsync(empresa, ct);
+            await _unitOfWork.SaveChangesAsync(ct);
 
             // Criar gestor
             var senhaHash = _authService.HashSenha(request.Senha);
@@ -101,20 +100,18 @@ public class EmpresaService : IEmpresaService
                 empresaId: empresa.Id);
 
             gestor.Ativar();
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(ct);
 
             // Vincular usuário à empresa
             var usuarioEmpresa = new UsuarioEmpresa(gestor.Id, empresa.Id, PerfilGestorId);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(ct);
 
             // Aceitar convite (se houver)
             if (convite != null)
             {
                 convite.Aceitar();
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.SaveChangesAsync(ct);
             }
-
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             _logger.LogInformation(
                 convite != null
@@ -130,13 +127,7 @@ public class EmpresaService : IEmpresaService
                 NomeGestor = gestor.Nome,
                 Mensagem = "Empresa cadastrada com sucesso!"
             });
-        }
-        catch (Exception ex)
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogError(ex, "Erro ao criar empresa: {Email}", request.EmailGestor);
-            throw;
-        }
+        }, cancellationToken);
     }
 
     /// <summary>

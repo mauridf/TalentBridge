@@ -129,8 +129,7 @@ public class CreditoService : ICreditoService
         if (!carrinho.ItensCarrinho.Any())
             return Result.Fail<PedidoResponseDto>("CARRINHO_VAZIO");
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
+        return await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
         {
             // Criar pedido
             var numeroPedido = GerarNumeroPedido();
@@ -139,7 +138,7 @@ public class CreditoService : ICreditoService
                 carrinhoId: carrinho.Id,
                 empresaId: empresaId);
 
-            await _unitOfWork.Pedidos.AddAsync(pedido, cancellationToken);
+            await _unitOfWork.Pedidos.AddAsync(pedido, ct);
 
             // Transferir itens do carrinho para o pedido
             foreach (var itemCarrinho in carrinho.ItensCarrinho)
@@ -156,19 +155,12 @@ public class CreditoService : ICreditoService
             // Finalizar carrinho
             carrinho.Finalizar();
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(ct);
 
             _logger.LogInformation("Pedido criado: Numero={Numero}, Empresa={EmpresaId}", numeroPedido, empresaId);
 
             return Result.Ok(MapearPedidoResponse(pedido));
-        }
-        catch (Exception ex)
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            _logger.LogError(ex, "Erro ao finalizar carrinho para empresa: {EmpresaId}", empresaId);
-            throw;
-        }
+        }, cancellationToken);
     }
 
     /// <summary>
