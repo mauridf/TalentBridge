@@ -87,9 +87,6 @@ public class EmpresaService : IEmpresaService
                 telefone: request.TelefoneEmpresa,
                 segmentoId: request.SegmentoId);
 
-            await _unitOfWork.Empresas.AddAsync(empresa, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
-
             // Criar gestor
             var senhaHash = _authService.HashSenha(request.Senha);
             var gestor = new Gestor(
@@ -100,10 +97,13 @@ public class EmpresaService : IEmpresaService
                 empresaId: empresa.Id);
 
             gestor.Ativar();
-            await _unitOfWork.SaveChangesAsync(ct);
+            empresa.Gestores.Add(gestor);
 
             // Vincular usuário à empresa
             var usuarioEmpresa = new UsuarioEmpresa(gestor.Id, empresa.Id, PerfilGestorId);
+            empresa.UsuarioEmpresas.Add(usuarioEmpresa);
+
+            await _unitOfWork.Empresas.AddAsync(empresa, ct);
             await _unitOfWork.SaveChangesAsync(ct);
 
             // Aceitar convite (se houver)
