@@ -48,7 +48,7 @@ public class RecrutadorController : ControllerBase
     [Authorize]
     public async Task<IActionResult> CriarDireto([FromBody] CriarRecrutadorDiretoRequestDto request)
     {
-        var empresaIdClaim = User.FindFirst("EmpresaId")?.Value;
+        var empresaIdClaim = User.FindFirst("idEmpresa")?.Value;
         if (string.IsNullOrEmpty(empresaIdClaim) || !Guid.TryParse(empresaIdClaim, out var empresaId))
         {
             return Unauthorized();
