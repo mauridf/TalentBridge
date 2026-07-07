@@ -59,6 +59,7 @@ try
     builder.Services.AddScoped<IDashboardService, DashboardService>();
     builder.Services.AddScoped<ILandingPageService, LandingPageService>();
     builder.Services.AddScoped<IDominioService, DominioService>();
+    builder.Services.AddScoped<ISegmentoService, SegmentoService>();
     builder.Services.AddScoped<IConviteService, ConviteService>();
 builder.Services.AddScoped<IRecrutadorService, RecrutadorService>();
     builder.Services.AddScoped<ICupomService, CupomService>();

@@ -82,19 +82,20 @@ public class CandidatoService : ICandidatoService
             ParceiroId = parceiroId
         };
 
+        // Auto-ativar conta (email de confirmação ainda não implementado)
+        candidato.ConfirmarEmail();
+
         await _unitOfWork.Candidatos.AddAsync(candidato, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Candidato criado: {Email} | ID: {Id}", request.Email, candidato.Id);
-
-        // TODO: Enviar email de confirmação
 
         return Result.Ok(new CriarCandidatoResponseDto
         {
             Id = candidato.Id,
             Nome = candidato.Nome,
             Email = candidato.Email,
-            Mensagem = "Candidato cadastrado com sucesso! Verifique seu email para confirmar a conta."
+            Mensagem = "Candidato cadastrado com sucesso!"
         });
     }
 

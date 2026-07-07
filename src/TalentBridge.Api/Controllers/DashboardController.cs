@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TalentBridge.Application.DTOs.Common;
 using TalentBridge.Application.DTOs.Dashboard;
 using TalentBridge.Application.Interfaces;
 
@@ -35,8 +36,8 @@ public class DashboardController : ControllerBase
         var resultado = await _dashboardService.ObterDashboardCandidatoAsync(Guid.Parse(usuarioIdClaim));
 
         return resultado.IsSuccess
-            ? Ok(resultado.Value)
-            : NotFound(new { erro = "Candidato não encontrado" });
+            ? Ok(ResultadoDto<DashboardCandidatoResponseDto>.Ok(resultado.Value))
+            : NotFound(ResultadoDto<object>.Falha("CANDIDATO_NAO_ENCONTRADO", "Candidato não encontrado"));
     }
 
     /// <summary>
@@ -54,8 +55,8 @@ public class DashboardController : ControllerBase
             Guid.Parse(empresaIdClaim), periodo);
 
         return resultado.IsSuccess
-            ? Ok(resultado.Value)
-            : NotFound(new { erro = "Empresa não encontrada" });
+            ? Ok(ResultadoDto<DashboardEmpresaResponseDto>.Ok(resultado.Value))
+            : NotFound(ResultadoDto<object>.Falha("EMPRESA_NAO_ENCONTRADA", "Empresa não encontrada"));
     }
 
     /// <summary>
@@ -71,6 +72,6 @@ public class DashboardController : ControllerBase
 
         var resultado = await _dashboardService.ObterDashboardAdminAsync();
 
-        return Ok(resultado.Value);
+        return Ok(ResultadoDto<DashboardAdminResponseDto>.Ok(resultado.Value));
     }
 }

@@ -10,17 +10,17 @@ namespace TalentBridge.Api.Controllers;
 [AllowAnonymous]
 public class SegmentoController : ControllerBase
 {
-    private readonly IDominioService _dominioService;
+    private readonly ISegmentoService _segmentoService;
 
-    public SegmentoController(IDominioService dominioService)
+    public SegmentoController(ISegmentoService segmentoService)
     {
-        _dominioService = dominioService;
+        _segmentoService = segmentoService;
     }
 
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        var resultado = await _dominioService.BuscarTodosAsync();
+        var resultado = await _segmentoService.ListarTodosAsync();
         return resultado.IsSuccess
             ? Ok(resultado.Value)
             : BadRequest("Erro ao buscar segmentos.");
