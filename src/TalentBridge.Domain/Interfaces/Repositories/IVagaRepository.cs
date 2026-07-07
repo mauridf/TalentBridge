@@ -27,6 +27,16 @@ public interface IVagaRepository : IRepository<Vaga>
     Task<IEnumerable<Vaga>> GetByEmpresaIdAsync(Guid empresaId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Busca vagas de uma empresa com paginação
+    /// </summary>
+    Task<IEnumerable<Vaga>> GetByEmpresaIdPaginadoAsync(Guid empresaId, int pagina, int tamanhoPagina, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Total de vagas de uma empresa
+    /// </summary>
+    Task<int> CountByEmpresaIdAsync(Guid empresaId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Busca vagas recomendadas para um candidato (baseado em perfil)
     /// </summary>
     Task<IEnumerable<Vaga>> GetVagasRecomendadasAsync(Guid candidatoId, CancellationToken cancellationToken = default);

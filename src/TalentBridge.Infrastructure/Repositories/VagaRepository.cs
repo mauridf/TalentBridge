@@ -65,6 +65,24 @@ public class VagaRepository : Repository<Vaga>, IVagaRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Vaga>> GetByEmpresaIdPaginadoAsync(Guid empresaId, int pagina, int tamanhoPagina, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Where(v => v.EmpresaId == empresaId)
+            .OrderByDescending(v => v.CreatedAt)
+            .Skip((pagina - 1) * tamanhoPagina)
+            .Take(tamanhoPagina)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> CountByEmpresaIdAsync(Guid empresaId, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .CountAsync(v => v.EmpresaId == empresaId, cancellationToken);
+    }
+
     public async Task<IEnumerable<Vaga>> GetVagasRecomendadasAsync(Guid candidatoId, CancellationToken cancellationToken = default)
     {
         // TODO: Implementar algoritmo de recomendação baseado no perfil do candidato

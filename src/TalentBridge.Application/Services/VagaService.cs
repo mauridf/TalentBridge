@@ -182,6 +182,42 @@ public class VagaService : IVagaService
         return Result.Ok(dtos);
     }
 
+    public async Task<Result<PaginacaoResponseDto<VagaResponseDto>>> GetByEmpresaPaginadoAsync(
+        Guid empresaId,
+        PaginacaoRequestDto paginacao,
+        CancellationToken cancellationToken = default)
+    {
+        var total = await _unitOfWork.Vagas.CountByEmpresaIdAsync(empresaId, cancellationToken);
+        var vagas = await _unitOfWork.Vagas.GetByEmpresaIdPaginadoAsync(
+            empresaId, paginacao.PageNumber, paginacao.PageSize, cancellationToken);
+
+        var empresa = await _unitOfWork.Empresas.GetByIdAsync(empresaId, cancellationToken);
+
+        var dtos = vagas.Select(v =>
+        {
+            var dto = v.Adapt<VagaResponseDto>();
+            dto.EmpresaNome = empresa?.Nome ?? "";
+            dto.Status = v.Status.ToString();
+            return dto;
+        });
+
+        var totalPages = (int)Math.Ceiling(total / (double)paginacao.PageSize);
+
+        return Result.Ok(new PaginacaoResponseDto<VagaResponseDto>
+        {
+            Data = dtos,
+            MetaData = new MetadadosPaginacaoDto
+            {
+                CurrentPage = paginacao.PageNumber,
+                TotalCount = total,
+                PageSize = paginacao.PageSize,
+                TotalPages = totalPages,
+                HasPrevious = paginacao.PageNumber > 1,
+                HasNext = paginacao.PageNumber < totalPages
+            }
+        });
+    }
+
     /// <summary>
     /// Encerra uma vaga
     /// </summary>

@@ -30,6 +30,11 @@ public interface IVagaService
     Task<Result<IEnumerable<VagaResponseDto>>> GetByEmpresaAsync(Guid empresaId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Lista vagas de uma empresa com paginação
+    /// </summary>
+    Task<Result<PaginacaoResponseDto<VagaResponseDto>>> GetByEmpresaPaginadoAsync(Guid empresaId, PaginacaoRequestDto paginacao, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Encerra uma vaga
     /// </summary>
     Task<Result> EncerrarAsync(Guid vagaId, Guid usuarioId, CancellationToken cancellationToken = default);

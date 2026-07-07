@@ -73,14 +73,20 @@ public class VagaController : ControllerBase
     }
 
     /// <summary>
-    /// Lista vagas de uma empresa
+    /// Lista vagas de uma empresa com paginação
     /// </summary>
     [HttpPost("empresa")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetByEmpresa([FromBody] Guid empresaId)
+    [Authorize]
+    public async Task<IActionResult> GetByEmpresa([FromBody] PaginacaoRequestDto paginacao)
     {
-        var resultado = await _vagaService.GetByEmpresaAsync(empresaId);
-        return Ok(ResultadoDto<IEnumerable<VagaResponseDto>>.Ok(resultado.Value));
+        var empresaIdClaim = User.FindFirst("idEmpresa")?.Value;
+        if (string.IsNullOrWhiteSpace(empresaIdClaim))
+            return Unauthorized(ResultadoDto<object>.Falha("SEM_EMPRESA", "Usuário não está associado a uma empresa."));
+
+        var resultado = await _vagaService.GetByEmpresaPaginadoAsync(Guid.Parse(empresaIdClaim), paginacao);
+        return resultado.IsSuccess
+            ? Ok(ResultadoDto<PaginacaoResponseDto<VagaResponseDto>>.Ok(resultado.Value))
+            : BadRequest(ResultadoDto<object>.Falha("ERRO_BUSCAR", "Erro ao buscar vagas."));
     }
 
     /// <summary>
